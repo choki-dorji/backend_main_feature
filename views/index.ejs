@@ -1,0 +1,36 @@
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- add jQuery library -->
+  <script src="/js/index.js"></script>
+</head>
+
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">First</th>
+        <th scope="col">Last</th>
+        <th scope="col">Handle</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+        <% for(var i = 0; i < blocks.length; i++) { %>
+      <tr>
+        <th scope="row"><%= blocks[i].block_name %></th>
+        <td><%= blocks[i].no_of_rooms %></td>
+        <td><%= blocks[i].type %></td>
+        <td><%= blocks[i].status %></td>
+        <td>
+          <a href="/update-block?id=<%= blocks[i]._id%>" class="btn border-shadow update">
+            edit
+        </a>
+          <a class="btn border-shadow delete" data-id=<%= blocks[i]._id%> >
+            delete
+          </a>
+        </td>
+      </tr>
+      
+<% } %>
+      </tbody>
+  </table>

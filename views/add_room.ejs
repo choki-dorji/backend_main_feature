@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    Create Room
+    <form action="/api/rooms" method="POST">
+
+        <input type="text" placeholder="room_name" name="room_name"/>
+
+        <input type="number" placeholder="room_capacity" name="room_capacity"/>
+
+        <input type="text" placeholder="isDisabled" name="isDisabled"/>
+
+        <input type="number" placeholder="window" name="window"/>
+
+        <input type="text" placeholder="status" name="status"/>
+
+        <input type="text" placeholder="block" name="block"/>
+
+        <input type="submit" value="Submit" />
+
+    </form>
+</body>
+</html>

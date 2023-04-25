@@ -5,7 +5,9 @@ const path = require("path");
 const blockRoute = require("./routes/router");
 const HttpError = require("./models/httperror");
 const RoomRoutes = require("./routes/roomRoutes");
-
+const yearRoute = require("./routes/year");
+const allocate = require("./routes/allocate");
+const chart = require("./routes/chart");
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,6 +16,12 @@ app.use(bodyParser.json());
 app.use("/", blockRoute.route);
 
 app.use("/room", RoomRoutes.route);
+
+app.use("/year", yearRoute.route);
+
+app.use("/Allocate", allocate.route);
+
+app.use("/chart", chart);
 
 app.set("view engine", "ejs");
 

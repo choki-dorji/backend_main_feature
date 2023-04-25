@@ -1,22 +1,21 @@
-$(document).ready(function () {
-  $(".delete").click(function () {
-    // add a click event listener to all delete buttons
-    var blockId = $(this).attr("data-id"); // get the block id from the data-id attribute
-    if (confirm("Are you sure you want to delete this block?")) {
-      // show a confirmation dialog box
-      $.ajax({
-        url: `/api/blocks/${blockId}`, // send a DELETE request to the server
-        type: "DELETE",
-        success: function () {
-          // handle the successful response
-          alert("Block deleted successfully");
-          location.reload(); // reload the page to reflect the updated data
-        },
-        error: function () {
-          // handle the error response
-          alert("Failed to delete block");
-        },
-      });
-    }
- } );
+// Attach event listener to delete icon
+console.log("sedrfghjkl;");
+$(".delete").click(function () {
+  console.log("delete");
+  var id = $(this).attr("data-id");
+
+  // Send AJAX request to delete block
+  $.ajax({
+    url: "http://localhost:5000/api/blocks/" + id,
+    method: "DELETE",
+    success: function (response) {
+      // If the block was successfully deleted, display a success message and reload the page
+      alert("Block deleted successfully!");
+      location.reload();
+    },
+    error: function (error) {
+      // If there was an error deleting the block, display an error message
+      alert("Error deleting block: " + error.responseText);
+    },
+  });
 });

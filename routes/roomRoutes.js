@@ -8,9 +8,13 @@ const roomController = require("../controllers/room");
 // route.get("/", service.getBlocks);
 
 route.get("/add-room", service.add_room);
-// route.get("/update-block", service.update_block);
+route.get("/", service.getRooms);
+route.get("/update-room", service.update_room);
 
 // API
 route.post("/api/rooms", roomController.createRoom);
+route.get("/api/rooms", roomController.getRoom);
+route.delete("/api/rooms/:id", roomController.delete);
+route.put("/api/rooms/:id", roomController.update_room);
 
 exports.route = route;

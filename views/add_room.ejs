@@ -7,8 +7,8 @@
     <title>Document</title>
 </head>
 <body>
-    Create Room
-    <form action="/api/rooms" method="POST">
+    <h2>Create Room</h2>
+    <form action="/room/api/rooms" method="POST" id="add">
 
         <input type="text" placeholder="room_name" name="room_name"/>
 
@@ -20,10 +20,12 @@
 
         <input type="text" placeholder="status" name="status"/>
 
-        <input type="text" placeholder="block" name="block"/>
+        <input type="text" placeholder="blockid" name="blockid"/>
 
         <input type="submit" value="Submit" />
 
     </form>
+    
+
 </body>
 </html>

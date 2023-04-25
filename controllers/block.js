@@ -6,7 +6,7 @@ const database = require("../models/models");
 const Block = database.Block;
 
 // create
-const createBlock = async (req, res, next) => {
+exports.createBlock = async (req, res, next) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
     const error = new HttpError(
@@ -17,9 +17,8 @@ const createBlock = async (req, res, next) => {
   }
   const { block_name, no_of_rooms, type, status } = req.body;
 
-  let existingBlock;
-
   if (Block.countDocuments() !== 0) {
+    let existingBlock;
     try {
       existingBlock = await Block.findOne({ block_name: block_name });
     } catch (err) {
@@ -44,51 +43,63 @@ const createBlock = async (req, res, next) => {
     no_of_rooms: no_of_rooms,
     rooms: [],
     type: type,
-    available: no_of_rooms,
     status: status,
   });
 
   try {
     await createdBlock.save();
-    res.redirect("/add-block");
-    // res.status(201).json({ block: createdBlock.toObject({ getters: true }) });
+    res.redirect("/");
   } catch (err) {
-    // console.log(err);
+    console.log(err);
     const error = new HttpError("creating Block failed, please try again", 500);
     return res.status(error.code || 500).json({ message: error.message });
   }
+
+  // res.status(201).json({ block: createdBlock.toObject({ getters: true }) });
+  res.status(201).json({ message: "block created successfully" });
 };
 
-// read
-exports.getBlock = (req, res) => {
-  if (req.query.id) {
-    const id = req.query.id;
-
-    Block.findById(id)
-      .then((data) => {
-        if (!data) {
-          res.status(404).send({ message: "Not found Block with id " + id });
-        } else {
-          res.send(data);
-        }
-      })
-      .catch((err) => {
-        res
-          .status(500)
-          .send({ message: "Erro retrieving Block with id " + id });
-      });
-  } else {
-    Block.find()
-      .then((user) => {
-        res.send(user);
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message:
-            err.message || "Error Occurred while retriving user information",
-        });
-      });
+// ***********************READ aLL******************************************8**********///
+exports.getBlock = async (req, res, next) => {
+  let blocks;
+  try {
+    blocks = await Block.find({});
+  } catch (err) {
+    const error = new HttpError("Fetching Block failed", 500);
+    return res.status(error.code || 500).json({ message: error.message });
   }
+  // res.json({ Block: blocks.map((block) => block.toObject({ getters: true })) });
+  res.send(blocks);
+};
+
+// *****************************READ BY ID******************************************************//
+exports.getBlockById = async (req, res, next) => {
+  const blockId = req.params.id;
+
+  let blocks;
+  try {
+    blocks = await Block.findById(blockId);
+    console.log(blocks);
+  } catch (err) {
+    const error = new HttpError(
+      "something went wrong, could not find a block",
+      500
+    );
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  if (!blocks) {
+    const error = new HttpError(
+      "Could not find an block for the provided id",
+      404
+    );
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  res.json({
+    block: blocks.toObject({ getters: true }),
+  });
+  // res.send(blocks);
 };
 
 // delete
@@ -118,7 +129,7 @@ exports.delete = (req, res) => {
 
 // update
 exports.update = (req, res) => {
-  console.log("inside uodate");
+  console.log("inside update block");
   if (!req.body) {
     return res.status(400).send({ message: "Data to update can not be empty" });
   }
@@ -140,5 +151,16 @@ exports.update = (req, res) => {
     });
 };
 
-exports.createBlock = createBlock;
-// exports.getBlock = getBlock;
+// *****************************************total block count
+
+exports.grtTotalBlocks = async (req, res) => {
+  let blocks;
+  try {
+    blocks = await Block.find({});
+  } catch (err) {
+    const error = new HttpError("Fetching Block failed", 500);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+  // res.json({ Block: blocks.map((block) => block.toObject({ getters: true })) });
+  res.send(blocks.length);
+};

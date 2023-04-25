@@ -1,0 +1,125 @@
+@media (max-width: 735px) {
+    .btn {
+      margin-left: 8%;
+    }
+    .box-menu {
+      margin-left: 5.5rem;
+    }
+  
+    nav .form-group input {
+      width: 100px;
+      margin-top: 0.2rem;
+      margin-left: -1.8rem;
+      height: 35px;
+    }
+    nav .form-group i {
+      margin-top: -0.2rem;
+      margin-right: 60px;
+    }
+    nav {
+      height: 102px;
+    }
+    #sidebar {
+      margin-top: 0.02rem;
+    }
+  
+    .bar-search {
+      margin-left: 8rem;
+    }
+    .search {
+      width: 35px;
+      margin-top: -0.8rem;
+      height: 35px;
+      border-radius: 20px;
+      border: 0.1em solid #c2c2c2;
+    }
+    .search__submit {
+      border-radius: 20px;
+      width: 28px;
+    }
+    .search:focus-within {
+      width: 100px;
+    }
+    /* search */
+    .search:focus-within {
+      width: 115%;
+    }
+  
+    /* side_navigation */
+    #sidebar.hide {
+      max-width: 0px;
+    }
+  
+    #content {
+      position: relative;
+      width: 100%;
+      /* content responsive on side navigation open */
+      left: 0;
+      padding-right: 28px;
+      transition: all 0.3s ease;
+    }
+  
+    #sidebar.hide + #content {
+      width: 100%; /* sidebar responsive (side distance on content */
+      margin-left: -6rem;
+    }
+    nav .pro {
+      margin-top: -34px;
+      margin-left: -15px;
+    }
+    #nav_logo {
+      width: 35px;
+      margin-left: -2px;
+    }
+    .btnn {
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      margin-top: -1.7rem;
+      margin-left: -3px;
+    }
+    .small i {
+      margin-left: 3.5rem;
+      margin-top: 2.4rem;
+    }
+    nav .pro {
+      height: 26px;
+      width: 50px;
+      border: 0.1em solid #ff4b13;
+    }
+    nav .profile .pro-pic {
+      width: 20px;
+      height: 20px;
+      padding-left: 3px;
+      /* profile */
+      margin-right: 25px;
+      border: 0.1em solid #ff4b13;
+    }
+    nav .profile .iconn {
+      font-size: 16px;
+      margin-left: 28px;
+    }
+  
+    /* sidebar details */
+    #sidebar {
+      max-width: 220px;
+    }
+    #sidebar .icon {
+      margin-left: -10px;
+    }
+  
+    #sidebar .list .nav-link {
+      font-size: 16px;
+      padding: 10px 20px;
+      margin: 6px 0 6px -12px;
+    }
+    .horizontal-line {
+      width: 80%;
+      margin-left: 18px;
+    }
+    .list .nav-link:hover {
+      background-color: #ff4a131e;
+      width: 110%;
+    }
+  }
+  

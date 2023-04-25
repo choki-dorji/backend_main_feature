@@ -11,7 +11,7 @@ const Block = new Schema({
 });
 
 // Room
-const RoomSchema = new mongoose.Schema({
+const Room = new mongoose.Schema({
   room_name: { type: String, required: true },
   room_capacity: { type: Number, required: true },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: "students" }],
@@ -34,7 +34,7 @@ const AcadYear = new Schema({
 });
 
 // Allocation
-const AllocationSchema = new mongoose.Schema({
+const Allocation = new mongoose.Schema({
   student: { type: String, required: true }, // as of now i will keep it dummy later from lakshey
   room: { type: mongoose.Schema.Types.ObjectId, ref: "Room", required: true },
   // room: { type: String, required: true },
@@ -64,3 +64,6 @@ const Request = new mongoose.Schema({
 });
 
 exports.Block = mongoose.model("Block", Block);
+exports.Room = mongoose.model("Room", Room);
+exports.AcadYear = mongoose.model("AcadYear", AcadYear);
+exports.Allocation = mongoose.model("Allocation", Allocation);

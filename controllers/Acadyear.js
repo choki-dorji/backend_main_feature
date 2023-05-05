@@ -6,6 +6,7 @@ const database = require("../models/models");
 const AcadYear = database.AcadYear;
 
 // create
+// create
 exports.createdYear = async (req, res, next) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
@@ -16,48 +17,74 @@ exports.createdYear = async (req, res, next) => {
     return res.status(error.code || 500).json({ message: error.message });
   }
   const { year, description } = req.body;
+  console.log(year, description);
 
   let existingyear;
 
-  if (AcadYear.countDocuments() !== 0) {
-    try {
-      existingyear = await AcadYear.findOne({ year: year });
-    } catch (err) {
-      const error = new HttpError("Creating year Failed, Try again later", 500);
-      return res.status(error.code || 500).json({ message: error.message });
+  try {
+    const count = await AcadYear.countDocuments();
+    if (count !== 0) {
+      existingyear = await AcadYear.findOne({ Year: year });
     }
+  } catch (err) {
+    const error = new HttpError("Creating year Failed, Try again later", 500);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
 
-    if (existingyear) {
-      const error = new HttpError(
-        "Already created Academic yearc for the year" + year,
-        422
-      );
-      return res.status(error.code || 500).json({ message: error.message });
-    }
+  if (existingyear) {
+    const error = new HttpError(
+      "Already created Academic year for the year " + year,
+      422
+    );
+    console.log(error.message);
+    return res.status(error.code || 500).json({ message: error.message });
   }
 
   const createdYear = new AcadYear({
     Year: year,
     Description: description,
     Created_by: "Admin-SSO",
+    date: new Date(),
   });
 
   try {
     await createdYear.save();
-    res.redirect("/");
-    // res.status(201).json({ block: createdBlock.toObject({ getters: true }) });
+    res.status(201).json(createdYear);
   } catch (err) {
-    // console.log(err);
+    console.log(err);
     const error = new HttpError(
-      "creating Academic year failed, for some unknown reason",
+      "Creating Academic year failed, for some unknown reason",
       500
     );
     return res.status(error.code || 500).json({ message: error.message });
   }
 };
 
-// read
+// fghjkl;
+// get all allocate
+exports.report = async (req, res, next) => {
+  // assuming room name is passed as a query parameter
 
-// update
+  let Acad;
+  try {
+    Acad = await AcadYear.find({});
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not find allocation.",
+      500
+    );
+    return res.status(error.code || 500).json({ message: error.message });
+  }
 
-// delete
+  if (!Acad) {
+    const error = new HttpError(
+      "Could not find a room with the provided name.",
+      404
+    );
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  // res.json({ year: room });
+  res.send(Acad);
+  // return res.render("Allocation/index", { Acad: Acad });
+};

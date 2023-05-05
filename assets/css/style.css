@@ -68,7 +68,7 @@ li {
   align-items: center;
   margin: 8px 0;
   padding: 14px 16px;
-  border-radius: 8px;
+  border-radius: 5px;
   text-decoration: none;
 }
 .list .nav-link:hover {
@@ -76,8 +76,9 @@ li {
 }
 .nav-link .icon {
   margin-right: 26px;
-  margin-left: 10px;
+  margin-left: 8px;
   color: #ff4b13;
+  opacity: 90%;
 }
 .nav-link .link {
   font-size: 16px;
@@ -86,6 +87,7 @@ li {
 .list .nav-link:hover .icon,
 .list .nav-link:hover .link {
   color: #ff4b13;
+  opacity: 90%;
 }
 
 .horizontal-line {
@@ -95,26 +97,28 @@ li {
   align-items: center;
   margin-left: 13%;
   margin-top: 1px;
+  opacity: 90%;
 }
 #sidebar.hide {
   max-width: 93px;
 }
 .building {
   padding-left: 0.2rem;
-  padding-right: 3px;
+  padding-right: 4px;
   font-size: 22px;
 }
 /* search icon side navigation */
 .sea {
   font-size: 26px;
+  padding-right: 1px;
 }
 /* add room,allocate, request, wheelchair icon side navigation */
 .housee {
   font-size: 24px;
-  padding-right: 1.5px;
+  padding-right: 2.5px;
 }
 /* search icon side navigation */
-a #sidebar.hide:hover {
+#sidebar.hide:hover {
   max-width: 260px;
 }
 #sidebar::-webkit-scrollbar {
@@ -168,40 +172,46 @@ a #sidebar.hide:hover {
 /* CSS code to show the dropdown content on hover */
 #sidebar .ab:hover .dropdown {
   display: block;
-  margin-left: 30%;
-  top: -0.5rem;
+  margin-left: 34%;
+  top: -0.1rem;
+  line-height: 10px;
 }
 
 #sidebar .male:hover {
   color: #ff4b13;
   text-decoration: none;
+  opacity: 90%;
+  margin-left: 5px;
 }
 #sidebar .female:hover {
   color: #ff4b13;
   top: -10px;
   text-decoration: none;
+  opacity: 90%;
+  margin-left: 5px;
 }
 /* SIDEBAR */
 
 /* CONTENT */
 #content {
   position: relative;
-  width: calc(100% - 248px);
+  width: calc(100% - 245px);
   /* content responsive on side navigation open */
-  left: 6.7rem;
+  left: 6.8rem;
   padding-right: 18px;
   transition: all 0.3s ease;
 }
 
 #sidebar.hide + #content {
-  width: calc(100% - 90px); /* sidebar responsive (side distance on content */
-  left: 1.6rem;
+  width: calc(100% - 85px); /* sidebar responsive (side distance on content */
+  left: 1.9rem;
 }
 /* NAVBAR */
 .box_menu {
   margin-left: 10.4rem;
   margin-top: 43px;
   color: #ff4b13;
+  opacity: 90%;
 }
 nav {
   width: 100%;
@@ -246,6 +256,7 @@ nav .form-group input {
 nav .form-group input:focus {
   outline: none;
   border-color: #ff4b13;
+  opacity: 90%;
 }
 nav .form-group .icon {
   position: absolute;
@@ -253,6 +264,7 @@ nav .form-group .icon {
   transform: translateY(-50%);
   right: 15px;
   color: #ff4b13;
+  opacity: 90%;
 }
 .btn {
   background-color: #ff4b13;
@@ -287,6 +299,7 @@ nav .pro {
   width: 60px;
   height: 30px;
   margin-top: -2.4rem;
+  opacity: 90%;
 }
 nav .iconn {
   position: absolute;
@@ -294,6 +307,7 @@ nav .iconn {
   color: #ff4b13;
   font-size: 22px;
   cursor: pointer;
+  opacity: 90%;
 }
 nav .profile {
   position: block;
@@ -311,6 +325,7 @@ nav .profile img {
   object-fit: cover;
   cursor: pointer;
   border: 1.5px solid #ff4b13;
+  opacity: 90%;
 }
 nav .profile .profile-link {
   position: absolute;
@@ -338,14 +353,50 @@ nav .profile .profile-link a {
   color: #ff4b13;
   align-items: center;
   transition: all 0.3s ease;
+  opacity: 90%;
 }
 nav .profile .profile-link a:hover {
   background: #ff4a131e;
 }
-/* NAVBAR */
+#sidebar.hide + .greetings {
+  padding-top: -4rem;
+}
+/* greetings div */
+#block .add-block {
+  width: 101.8%;
+  height: 70px;
+}
+#block .add-block {
+  margin-top: 32px;
+  height: 70px;
+}
+#block .block-title {
+  font-size: 24px;
+  margin-left: 1.5rem;
+  padding-top: 0.9rem;
+  font-weight: bold;
+  opacity: 90%;
+}
+#block .add-block-text {
+  font-size: 20px;
+  padding-top: 01.1rem;
+  opacity: 90%;
+}
 
-/* profile link */
-/* MAIN */
+#block .add {
+  background-color: #ff4b13;
+  opacity: 90%;
+  color: #fff;
+}
+
+#sidebar .block-back {
+  color:#ff4b13;
+  background-color: #ff4a131e;
+  opacity:90%;
+}
+#sidebar .block-back .link {
+  color:#ff4b13;
+}
 
 @media (max-width: 732px) {
   .btn {

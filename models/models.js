@@ -14,7 +14,9 @@ const Block = new Schema({
 const Room = new mongoose.Schema({
   room_name: { type: String, required: true },
   room_capacity: { type: Number, required: true },
-  members: [{ type: mongoose.Schema.Types.ObjectId, ref: "students" }],
+  members: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "students", required: false },
+  ],
   availability: { type: Number, required: true },
   isDisabled: { type: Boolean, required: false },
   blockid: {
@@ -28,20 +30,30 @@ const Room = new mongoose.Schema({
 
 // AcademicYear
 const AcadYear = new Schema({
-  Year: { type: String, required: true },
+  Year: { type: String, required: true, unique: true },
   Description: { type: String, required: true },
   Created_by: { type: String, required: true },
+  date: { type: Date, required: true },
 });
 
 // Allocation
 const Allocation = new mongoose.Schema({
-  student: { type: String, required: true }, // as of now i will keep it dummy later from lakshey
-  room: { type: mongoose.Schema.Types.ObjectId, ref: "Room", required: true },
-  // room: { type: String, required: true },
-  // year: { type: Number, required: true },
+  student: { type: String, required: true },
+  student_name: { type: String, required: true }, // as of now i will keep it dummy later from lakshey
+  roomid: { type: mongoose.Schema.Types.ObjectId, ref: "Room", required: true },
+  room_name: { type: String, required: true },
+  blockid: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Room",
+    required: true,
+  },
+  course: { type: String, required: true },
+  sid: { type: String, required: true },
+  block_name: { type: String, required: true },
   year: { type: String, required: true },
-  created: { type: Date, required: false },
-  isDisabled: { type: Boolean, required: true },
+  created: { type: String, required: true },
+  academicyear: { type: String, required: true },
+  isDisabled: { type: Boolean, required: false },
 });
 
 // Request
@@ -67,3 +79,4 @@ exports.Block = mongoose.model("Block", Block);
 exports.Room = mongoose.model("Room", Room);
 exports.AcadYear = mongoose.model("AcadYear", AcadYear);
 exports.Allocation = mongoose.model("Allocation", Allocation);
+exports.Request = mongoose.model("Request", Request);

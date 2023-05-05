@@ -11,8 +11,8 @@ exports.createRoom = async (req, res) => {
     res.status(400).send({ message: "Content can not be emtpy!" });
     return;
   }
-  const { room_name, room_capacity, isDisabled, window, status, blockid } =
-    req.body;
+  const { room_name, room_capacity, isDisabled, status, blockid } = req.body;
+  console.log(room_name, room_capacity, isDisabled, status, blockid);
   let existingRoom;
   try {
     existingRoom = await Room.findOne({ room_name: room_name });
@@ -50,7 +50,7 @@ exports.createRoom = async (req, res) => {
     member: [],
     availability: room_capacity,
     blockid: blockid,
-    window: window,
+    window: 4,
     isDisabled: isDisabled,
     type: block.type,
     status: status, // assign the type of block to the type of room
@@ -72,37 +72,20 @@ exports.createRoom = async (req, res) => {
   }
 };
 // read
-exports.getRoom = (req, res) => {
-  if (req.query.id) {
-    const id = req.query.id;
-
-    Room.findById(id)
-      .then((data) => {
-        if (!data) {
-          res.status(404).send({ message: "Not found Block with id " + id });
-        } else {
-          res.send(data);
-        }
-      })
-      .catch((err) => {
-        res
-          .status(500)
-          .send({ message: "Erro retrieving Block with id " + id });
-      });
-  } else {
-    Room.find()
-      .then((user) => {
-        res.send(user);
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message:
-            err.message || "Error Occurred while retriving user information",
-        });
-      });
+exports.getRoom = async (req, res, next) => {
+  let rooms;
+  try {
+    rooms = await Room.find({});
+  } catch (err) {
+    const error = new HttpError(
+      "something went wrong, could not find a room",
+      500
+    );
+    return res.status(error.code || 500).json({ message: error.message });
   }
+  // res.json({ rooms: rooms.map((room) => room.toObject({ getters: true })) });
+  res.send(rooms);
 };
-
 // update
 exports.update_room = (req, res) => {
   // console.log("inside uodate");
@@ -131,13 +114,12 @@ exports.update_room = (req, res) => {
 exports.delete = async (req, res) => {
   const id = req.params.id;
 
-      // Find the room to be deleted
-      const room = await Room.findById(id);
+  // Find the room to be deleted
+  const room = await Room.findById(id);
 
-      if (!room) {
-        return res.status(404).json({ message: 'Room not found' });
-      }
-  
+  if (!room) {
+    return res.status(404).json({ message: "Room not found" });
+  }
 
   // Remove the room's ID from the corresponding block document
   const block = await Block.findById(room.blockid);
@@ -161,4 +143,29 @@ exports.delete = async (req, res) => {
         message: "Could not delete room with id=" + id,
       });
     });
+};
+
+// searchRoom
+// searchRoom
+exports.searchRoom = async (req, res) => {
+  const roomName = req.query.room_name;
+  if (!roomName) {
+    const error = new HttpError("Missing query parameter: room_name", 400);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  let room;
+  try {
+    room = await Room.findOne({ room_name: roomName });
+  } catch (err) {
+    const error = new HttpError("Something went wrong, could not search for room", 500);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  if (!room) {
+    const error = new HttpError("Room not found", 404);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  res.json({ room: room.toObject({ getters: true }) });
 };

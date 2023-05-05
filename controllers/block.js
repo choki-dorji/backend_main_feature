@@ -15,7 +15,7 @@ exports.createBlock = async (req, res, next) => {
     );
     return res.status(error.code || 500).json({ message: error.message });
   }
-  const { block_name, no_of_rooms, type, status } = req.body;
+  const { block_name, type, status } = req.body;
 
   if (Block.countDocuments() !== 0) {
     let existingBlock;
@@ -40,7 +40,7 @@ exports.createBlock = async (req, res, next) => {
 
   const createdBlock = new Block({
     block_name: block_name,
-    no_of_rooms: no_of_rooms,
+    no_of_rooms: 0,
     rooms: [],
     type: type,
     status: status,
@@ -48,7 +48,7 @@ exports.createBlock = async (req, res, next) => {
 
   try {
     await createdBlock.save();
-    res.redirect("/");
+    // res.redirect("/");
   } catch (err) {
     console.log(err);
     const error = new HttpError("creating Block failed, please try again", 500);
@@ -56,7 +56,7 @@ exports.createBlock = async (req, res, next) => {
   }
 
   // res.status(201).json({ block: createdBlock.toObject({ getters: true }) });
-  res.status(201).json({ message: "block created successfully" });
+  // res.send("block created successfully");
 };
 
 // ***********************READ aLL******************************************8**********///
@@ -79,7 +79,6 @@ exports.getBlockById = async (req, res, next) => {
   let blocks;
   try {
     blocks = await Block.findById(blockId);
-    console.log(blocks);
   } catch (err) {
     const error = new HttpError(
       "something went wrong, could not find a block",
@@ -96,10 +95,10 @@ exports.getBlockById = async (req, res, next) => {
     return res.status(error.code || 500).json({ message: error.message });
   }
 
-  res.json({
-    block: blocks.toObject({ getters: true }),
-  });
-  // res.send(blocks);
+  // res.json({
+  //   block: blocks.toObject({ getters: true }),
+  // });
+  res.send(blocks);
 };
 
 // delete
@@ -149,18 +148,4 @@ exports.update = (req, res) => {
     .catch((err) => {
       res.status(500).send({ message: "Error Update user information" });
     });
-};
-
-// *****************************************total block count
-
-exports.grtTotalBlocks = async (req, res) => {
-  let blocks;
-  try {
-    blocks = await Block.find({});
-  } catch (err) {
-    const error = new HttpError("Fetching Block failed", 500);
-    return res.status(error.code || 500).json({ message: error.message });
-  }
-  // res.json({ Block: blocks.map((block) => block.toObject({ getters: true })) });
-  res.send(blocks.length);
 };

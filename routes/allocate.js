@@ -7,9 +7,10 @@ const allocateController = require("../controllers/Allocate");
 // for thr ejs
 // route.get("/", service.getBlocks);
 
-route.get("/add-allocation", service.add_Allocation);
+route.get("/all", service.getAllocationbyId);
 
 // API
-route.post("/api/years", allocateController.allocateRoomByYearAndBlock);
+route.post("/api/years/:year", allocateController.allocateRoomByYearAndBlock);
+route.get("/api/years/:year", allocateController.getallocationbyYear);
 
 exports.route = route;

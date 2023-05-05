@@ -6,7 +6,7 @@ const ChartJS = async (req, res) => {
     // get student data
     response = await axios.get("http://localhost:3000/students");
   } catch (err) {
-    console.error(err);
+    console.log(err);
     return res.status(500).send("Error fetching student data");
   }
 
@@ -24,27 +24,9 @@ const ChartJS = async (req, res) => {
       return acc;
     }, {});
   }
-  // do something with the grouped data...
-  // res.render("chart", { groupedData: groupedData });
-  res.send(groupedData);
-  // console.log(groupedData);
-};
-// total number
-const TotalStudents = async (req, res) => {
-  let response;
-  try {
-    // get student data
-    response = await axios.get("http://localhost:3000/students");
-  } catch (err) {
-    console.error(err);
-    return res.status(500).send("Error fetching student data");
-  }
-
-  // calculate total count of students
-  const totalCount = response.data.students.length;
-
-  return res.send(totalCount);
+  // render the chart view and pass the grouped data as a parameter
+  // res.render("chart", { chart: groupedData });
+  req.locals.chart = groupedData;
 };
 
 exports.ChartJS = ChartJS;
-exports.TotalStudents = TotalStudents;

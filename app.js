@@ -1,17 +1,25 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const session = require("express-session");
 const path = require("path");
+const cookieParser = require("cookie-parser");
 const blockRoute = require("./routes/router");
 const HttpError = require("./models/httperror");
 const RoomRoutes = require("./routes/roomRoutes");
 const yearRoute = require("./routes/year");
+const request = require("./routes/request");
+const student = require("./routes/students")
 const allocate = require("./routes/allocate");
 const chart = require("./routes/chart");
+const login = require("./routes/login");
 const app = express();
+
+// set up se
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 app.use("/", blockRoute.route);
 
@@ -21,7 +29,18 @@ app.use("/year", yearRoute.route);
 
 app.use("/Allocate", allocate.route);
 
-app.use("/chart", chart);
+app.use("/request", request.route);
+
+app.use("/dashboard", chart);
+
+app.use("/login", login);
+
+// students
+app.use("/students", student.route)
+
+// app.get("*", function (req, res) {
+//   res.status(404).render("pagenotfound/index");
+// });
 
 app.set("view engine", "ejs");
 

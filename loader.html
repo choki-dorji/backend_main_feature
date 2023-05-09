@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document Title</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+   .hide {
+  display: none;
+}
+
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-circle {
+  position: relative;
+  border: 8px solid #ccc;
+  border-top-color: #ff4b13;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: spin 1s infinite linear;
+}
+
+.loader-percentage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff4b13;
+}
+
+.loader-text {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #555;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+
+    </style>
+  </head>
+  <body>
+<div class="loader">
+  <div class="loader-circle">
+    <div class="loader-percentage"></div>
+  </div>
+  <div class="loader-text">Loading...</div>
+</div>
+
+<header class="hide">
+  <nav>
+    <ul>
+      <li><a href="#">Link 1</a></li>
+      <li><a href="#">Link 2</a></li>
+      <li><a href="#">Link 3</a></li>
+    </ul>
+  </nav>
+</header>
+<main class="hide">
+  <h1>Main Heading</h1>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod lorem auctor sapien fermentum, eget auctor magna tincidunt. Pellentesque vitae velit sapien.</p>
+</main>
+<footer class="hide">
+  <p>Copyright © 2023</p>
+</footer>
+    <script>
+    var loaderCircle = document.querySelector(".loader-circle");
+var loaderPercentage = document.querySelector(".loader-percentage");
+var percentage = 0;
+
+var interval = setInterval(function() {
+  percentage += 1;
+  loaderPercentage.innerHTML = percentage + "%";
+  loaderCircle.style.borderTopColor = "#ff4b13";
+  
+  if (percentage >= 100) {
+    clearInterval(interval);
+    loaderCircle.style.animation = "none";
+    loaderCircle.style.borderTopColor = "#555";
+    loaderPercentage.innerHTML = "Done!";
+    setTimeout(function() {
+      loaderCircle.parentNode.removeChild(loaderCircle);
+      var elementsToShow = document.querySelectorAll(".hide");
+      for (var i = 0; i < elementsToShow.length; i++) {
+        elementsToShow[i].classList.remove("hide");
+      }
+    }, 2000);
+  }
+}, 50);
+
+
+
+</script>
+</body>

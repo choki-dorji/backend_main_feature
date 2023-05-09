@@ -131,7 +131,7 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
           // Check if the student has already been allocated to a room
           const existingAllocation = await Allocate.findOne({
             student: student._id,
-            AcadYear: currentYear
+            AcadYear: currentYear,
           });
           console.log("inside for loop & if");
           if (existingAllocation) {
@@ -183,7 +183,9 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
               course: student.specialization,
               academicyear: currentYear,
               sid: student.sid,
+              student_gender: student.gender,
               isDisabled: student.isDisabled,
+              student_email: student.email,
               created: `${day}/${month}/${year}`,
             });
 

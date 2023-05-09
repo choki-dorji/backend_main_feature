@@ -18,7 +18,10 @@ exports.Login = async (req, res) => {
       // res.cookie("token", user.token, { httpOnly: true });
       const token = user.token;
       res.cookie("tokenABC", token, { httpOnly: true, secure: true });
-      console.log(req.cookies.tokenABC);
+      console.log("token", req.cookies.tokenABC);
+
+       const userData = user.data.user.rows[0];
+      res.cookie("userData", JSON.stringify(userData), { httpOnly: true, secure: true });
 
       if (roleid === 3) {
         res.redirect(

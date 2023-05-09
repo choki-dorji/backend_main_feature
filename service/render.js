@@ -10,14 +10,12 @@ exports.getBlock = (req, res) => {
     .all([
       axios.get("http://localhost:5000/api/blocks"),
       axios.get("http://localhost:5000/room/api/rooms"),
-      axios.get("http://localhost:3000/students"),
     ])
     .then(
-      axios.spread(function (blocksResponse, roomsResponse, studentResponse) {
+      axios.spread(function (blocksResponse, roomsResponse) {
         res.render("blockd/index", {
           blocks: blocksResponse.data,
           rooms: roomsResponse.data,
-          students: studentResponse.data.students,
         });
       })
     )
@@ -34,8 +32,6 @@ exports.getBlocks = (req, res) => {
   const err = req.query.error;
   const currentYear = new Date().getFullYear();
   console.log("before axios");
-
-  userSession.setUserSession(token, username);
 
   try {
     axios
@@ -359,13 +355,20 @@ exports.getWholeAllocationYear = function (req, res) {
   Promise.all([
     axios.get(`http://localhost:5000/year/allocations`),
     axios.get(`http://localhost:5000/Allocate//api/years/${year}`),
+    axios.get(`http://localhost:5000/room/api/rooms`),
+    axios.get(`http://localhost:5000/api/blocks`),
+    axios.get(`http://localhost:5000/year/allocations`),
   ])
     .then((responses) => {
       const yearData = responses[0].data;
       const AllocateData = responses[1].data;
+      const room = responses[2].data;
+      const blocks = responses[3].data;
       res.render("Allocation/index", {
         Acad: yearData,
         allocate: AllocateData,
+        room: room,
+        blocks: blocks,
       });
     })
     .catch((err) => {

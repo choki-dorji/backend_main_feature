@@ -9,7 +9,7 @@ const HttpError = require("./models/httperror");
 const RoomRoutes = require("./routes/roomRoutes");
 const yearRoute = require("./routes/year");
 const request = require("./routes/request");
-const student = require("./routes/students")
+const student = require("./routes/students");
 const allocate = require("./routes/allocate");
 const chart = require("./routes/chart");
 const login = require("./routes/login");
@@ -36,7 +36,7 @@ app.use("/dashboard", chart);
 app.use("/login", login);
 
 // students
-app.use("/students", student.route)
+app.use("/students", student.route);
 
 // app.get("*", function (req, res) {
 //   res.status(404).render("pagenotfound/index");

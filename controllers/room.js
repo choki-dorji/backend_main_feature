@@ -158,7 +158,10 @@ exports.searchRoom = async (req, res) => {
   try {
     room = await Room.findOne({ room_name: roomName });
   } catch (err) {
-    const error = new HttpError("Something went wrong, could not search for room", 500);
+    const error = new HttpError(
+      "Something went wrong, could not search for room",
+      500
+    );
     return res.status(error.code || 500).json({ message: error.message });
   }
 
@@ -168,4 +171,28 @@ exports.searchRoom = async (req, res) => {
   }
 
   res.json({ room: room.toObject({ getters: true }) });
+};
+
+//
+exports.getRoomByBlockId = async (req, res, next) => {
+  const blockId = req.params.id;
+
+  let rooms;
+  try {
+    rooms = await Room.find({ blockid: blockId });
+  } catch (err) {
+    const error = new HttpError("fetching room failed", 500);
+    // return next(error)
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  if (!rooms || rooms.length === 0) {
+    const error = new HttpError(
+      "Couldn't find a room for the provided user id",
+      404
+    );
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+  // res.json({ room: rooms.map((place) => place.toObject({ getters: true })) });
+  res.send(rooms);
 };

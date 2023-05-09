@@ -23,4 +23,6 @@ route.put("/api/rooms/:id", roomController.update_room);
 // route.get("/search/room", roomController.searchRoomByName);
 route.get("/api/search", roomController.searchRoom);
 
+route.get("/api/room/block/:id", roomController.getRoomByBlockId);
+
 exports.route = route;

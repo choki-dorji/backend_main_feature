@@ -192,7 +192,7 @@
 											<select class="input-1" onfocus="setFocus(true)" onblur="setFocus(false)" id="block-type" required  onchange="myFunction()" >
 												<% for(var j = 0; j < block.length; j++) { %>
 													<% 
-													var room = roommate[0].gender === 'F' ? 'boys' : 'girls';
+													var room = userdata.gender === 'F' ? 'girls' : 'boys';
 													if(block[j].type === room ) { %>
 															<option value="<%= block[j]._id %>"><%= block[j].block_name %></option>
 													<% } %>
@@ -214,7 +214,7 @@
 
 												<div class="input-box active-grey">
 														<label class="input-label">Attach files</label>
-														<input type="file" name="files" multiple class="input-1" onfocus="setFocus(true)" style="height: 150px;" id="file" onblur="setFocus(false)" />
+														<input type="file" name="filename" multiple class="input-1" onfocus="setFocus(true)" style="height: 150px;" id="file" onblur="setFocus(false)" />
 														
 												</div>
 
@@ -232,7 +232,9 @@
 					const targetBlock = document.getElementById('block-type').value;
 					const targetRoom = document.getElementById('room-select').value;
 					const reason = document.getElementById('reason').value;
-					const filename = document.getElementById('file').value;
+					const fileName = document.getElementById('file');
+					const selectedFile = fileName.files[0];
+					const filename = selectedFile.name
 					// Return the values as an object
 					return { targetBlock, targetRoom, reason, filename };
 				}
@@ -241,17 +243,17 @@
         if (result.isConfirmed) {
             // Send AJAX request to delete block
 				
-						const { targetBlock, targetRoom } = result.value;
+						const { targetBlock, targetRoom, reason, filename } = result.value;
 						//
 						//
-						console.log("before ajax")
+						console.log("file", filename)
 					
 						fetch(`http://localhost:5000/students/changeroom/${id}`, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
   },
-  body: JSON.stringify({ targetBlock, targetRoom })
+  body: JSON.stringify({ targetBlock, targetRoom, reason, filename })
 })
   .then(response => {
     if (!response.ok) {

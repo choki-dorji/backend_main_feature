@@ -5,6 +5,7 @@ const Allocate = stud.Allocation;
 const Block = stud.Block;
 const rooms = stud.Room;
 const Request = stud.Request;
+const removedStudents = stud.removedStudents;
 
 // get roomm mate
 exports.getRoommates = async (req, res) => {
@@ -36,7 +37,11 @@ exports.getRoommates = async (req, res) => {
 };
 
 // request Hostelchange/////////////////////////////////////////////////////////
-const storage = multer.diskStorage({
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+exports.hostelChangeRequest = async (req, res) => {
+  const { targetBlock, targetRoom, reason} = req.body;
+  const studentId = req.params.uid;
+  const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
   },
@@ -47,12 +52,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-exports.hostelChangeRequest = async (req, res) => {
-  const { targetBlock, targetRoom } = req.body;
-  const studentId = req.params.uid;
+
 
   // Assuming the logged-in student's ID is stored in the `id` property of the `req.user` object
+ 
 
   try {
     upload.single("filename")(req, res, async function (err) {
@@ -69,7 +72,9 @@ exports.hostelChangeRequest = async (req, res) => {
         return res.status(404).json({ message: "Block not found" });
       }
 
-      const filename = req.file ? req.file.filename : null;
+      const fileName = req.file.filename
+      console.log(fileName)
+
 
       // Check if the specified room exists in the specified block
       const room = await rooms.findOne({
@@ -137,7 +142,6 @@ exports.hostelChangeRequest = async (req, res) => {
       const seconds = now.getSeconds();
 
       const curdate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
       // Create a new request object
 
       const request = new Request({
@@ -149,7 +153,8 @@ exports.hostelChangeRequest = async (req, res) => {
         Requested: curdate,
         status: "pending",
         Remarks: "requested",
-        image: filename,
+        image: fileName,
+        reason: reason,
         student_name: student_name,
         student_email: student_email,
         student_course: student_course,
@@ -170,5 +175,38 @@ exports.hostelChangeRequest = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// //////////////
+exports.editstudents = async (req, res) => {
+  const studentId = req.params.id;
+  const remarks = req.body.remarks;
+
+  try {
+    const updatedStudent = await Allocate.findOneAndUpdate(
+      { sid: studentId },
+      { allocated: "No", remarks: remarks },
+      { new: true }
+    );
+
+    if (!updatedStudent) {
+      return res.status(404).send({
+        message: `Cannot update allocation and remarks for student with sid ${studentId}. Maybe sid is wrong`,
+      });
+    }
+
+    res.send({
+      message: "Student allocation and remarks were updated successfully!",
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .send({
+        message:
+          "Could not update student allocation and remarks with sid=" +
+          studentId,
+      });
   }
 };

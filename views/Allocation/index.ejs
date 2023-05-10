@@ -302,16 +302,20 @@ margin-left:4.9rem;
         </div>
       </div>
       <div class="col-lg-12 col-md-12 col-sm-12 block1">
+        
         <div class="shadow-box1">
+             
           <br><br>
           <h6 class="pre">Previous allocation</h6>
           <a class="" href="" style="cursor:pointer;">
             <div class="pdf text-left">
               <p class="download mt-2 ml-3">Download</p>
               <i class="bi bi-file-earmark-pdf pdff"></i>
+              
             </div>
           </a>
           <br>
+          
           <div class="col-lg-12 col-md-12 col-sm-12">
             <div class="table-responsive">
              <%- include('./table.ejs') %>
@@ -425,14 +429,20 @@ margin-left:4.9rem;
 <script>
   const yearSelect = document.getElementById("yearSelect");
   const allocationTable = document.getElementById("allocationTable");
+  const showcurrent = document.getElementById("showcurr");
 
   yearSelect.addEventListener("change", () => {
     const year = yearSelect.value;
+    const curyear =  new Date().getFullYear().toString();
+    
+    if(year === curyear) {
     fetch(`/Allocate/api/years/${year}`)
       .then((response) => response.json())
       .then((data) => {
         let tableHTML = "";
         data.forEach((allocation, index) => {
+         
+         
           tableHTML += `
             <tr>
               <td>${index + 1}</td>
@@ -444,6 +454,7 @@ margin-left:4.9rem;
               <td>${allocation.academicyear}</td>
             </tr>
           `;
+          
         });
         allocationTable.innerHTML = `
           <thead>
@@ -461,7 +472,47 @@ margin-left:4.9rem;
         `;
       })
       .catch((error) => console.error(error));
+    } else {
+      fetch(`/Allocate/api/years/${year}`)
+      .then((response) => response.json())
+      .then((data) => {
+        let tableHTML = "";
+        data.forEach((allocation, index) => {
+         
+          tableHTML += `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${allocation.room_name}</td>
+              <td>${allocation.block_name}</td>
+              <td>${allocation.year}</td>
+              <td>${allocation.student_name}</td>
+              <td>${allocation.course}</td>
+              <td>${allocation.academicyear}</td>
+            </tr>
+          `;
+          
+        });
+        allocationTable.innerHTML = `
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Room</th>
+              <th>Block</th>
+              <th>Year</th>
+              <th>Name</th>
+              <th>Course</th>
+              <th>Academic Year</th>
+            </tr>
+          </thead>
+          <tbody>${tableHTML}</tbody>
+        `;
+      })
+      .catch((error) => console.error(error));
+    
+
+    }
   });
+
 </script>
 
 

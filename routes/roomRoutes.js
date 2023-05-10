@@ -3,6 +3,7 @@ const route = express.Router();
 
 const service = require("../service/render");
 const roomController = require("../controllers/room");
+const stud = require("../controllers/student");
 
 route.get("/add-room", service.add_room);
 route.get("/", service.getRooms);
@@ -24,5 +25,7 @@ route.put("/api/rooms/:id", roomController.update_room);
 route.get("/api/search", roomController.searchRoom);
 
 route.get("/api/room/block/:id", roomController.getRoomByBlockId);
+
+route.put("/api/room/student/:id", stud.editstudents);
 
 exports.route = route;

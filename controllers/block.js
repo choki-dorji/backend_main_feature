@@ -4,6 +4,7 @@ const { validationResult } = require("express-validator");
 const HttpError = require("../models/httperror");
 const database = require("../models/models");
 const Block = database.Block;
+const Allocate = database.Allocation;
 
 // create
 exports.createBlock = async (req, res, next) => {
@@ -148,4 +149,21 @@ exports.update = (req, res) => {
     .catch((err) => {
       res.status(500).send({ message: "Error Update user information" });
     });
+};
+
+// /////total students in block
+exports.countStudentsInBlock = async (req, res) => {
+  const blockId = req.params.blockId;
+  const currentYear = new Date().getFullYear()
+
+  try {
+    const count = await Allocate.countDocuments({ blockid: blockId, academicyear: currentYear});
+
+    res.status(200).send(count.toString());
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Could not count students in block with blockId=" + blockId,
+    });
+  }
 };

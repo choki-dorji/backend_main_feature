@@ -44,11 +44,13 @@
                     <i class='bx bx-home bx-tada-hover bui'></i>
                 </div>
             </div>
+            
             <div class="box">
-                <div class="di">
-                    <h5 class="fon font-weight-bold nt">45</h5>
-                    <h6 class="fon roo st">Students</h6>
-                </div>
+              <div class="di">
+                <h5 class="fon font-weight-bold nt" blockId="<%= block._id %>"></h5>
+                <h6 class="fon roo st">Students</h6>
+              </div>
+              
                 <div class="ico di">
                     <i class="far  fa-user fa-outline builds"></i>
                 </div>
@@ -81,7 +83,6 @@
                       <% var studentsInRoom = allocate.filter(a => a.roomid === rooms[i]._id); %>
                       <% console.log("fghjkl", studentsInRoom) %>
                       <% if (studentsInRoom.length > 0) { %>
-                        
                         <tr>
                           <td><%= i %></td>
                           <td><%= rooms[i].room_name %></td>
@@ -119,14 +120,16 @@
                             <% }); %>
                           </td>
                           <td>
-                            <i class="bx bx-edit bx-flashing-hover room-ico"></i>
-                            <i class="bx bx-trash bx-flashing-hover room-ico"></i>
+                            <% studentsInRoom.forEach(function(student, index) { %>
+                              <i data-id=<%= student.sid %> class="bx bx-trash room-ico add"></i>
+                              <% if (index < studentsInRoom.length - 1) { %>
+                                <br>
+                              <% } %>
+                            <% }); %>
                           </td>
                         </tr>
+
                       <% } else { %>
-                    
-                     
-                         
                       <tr>
                         <td><%= i %></td>
                         <td><%= rooms[i].room_name %></td>
@@ -146,8 +149,7 @@
                           
                         </td>
                         <td>
-                          <i class="bx bx-edit bx-flashing-hover room-ico"></i>
-                          <i class="bx bx-trash bx-flashing-hover room-ico"></i>
+                          <i class="bx bx-trash room-ico"></i>
                         </td>
                       </tr>
                       <% } %>
@@ -175,8 +177,107 @@
 
 <!-- NAVBAR -->
 
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script src="script.js"></script>
+<script>
+  $(".add").click(function() {
+    var id = $(this).attr("data-id");
+		console.log(id);
+       
+    // Show confirmation message using SweetAlert2
+    Swal.fire({
+        html: `
+				<h5>Remove Students</h5>
+								<form>
+										<div class="form-group">
+                      <h6>Give a reason to remove a student</h6>
+                          
+                          <div class="input-box">
+														<label class="input-label">Reason To Remove</label>
+														<textarea type="text" class="input-1" style="height: 150px" onfocus="setFocus(true)" id="reason" onblur="setFocus(false)"></textarea>
+												</div>
+										</div>
+								</form>
+				`,
+				showCancelButton: true,
+				showConfirmButton: true,
+				confirmButtonColor: "#ff4b13",
+				cancelButtonColor: "#000",
+				confirmButtonText: "Remove",
+				preConfirm: () => {
+					// Retrieve the values of the input fields
+					const remarks = document.getElementById('reason').value;
+				
+					// Return the values as an object
+					return { remarks };
+				}
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Send AJAX request to delete block
+						const {remarks} = result.value;
+						
+						//
+						//
+						$.ajax({
+								url: `/room/api/room/student/${id}`,
+								method: "PUT",
+								data: { remarks },
+								success: function(response) {
+										// If the block was successfully updated, display a success message using Toastify and reload the page
+										Toastify({
+												text: "student was removed successfully!",
+												backgroundColor: "linear-gradient(to right, #96c93d, #00b09b)",
+												className: "success",
+												position:"top-center",
+										}).showToast();
+										window.location.reload();
+								},
+								error: function(error) {
+										// If there was an error updating the block, display an error message using Toastify
+										Toastify({
+												text: "Error removing student: " + error.responseText,
+												backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+												className: "error",
+												position:"top-center",
+										}).showToast();
+								}
+						});
+
+        }
+    });
+});
+</script>
+<script>
+  function setFocus(on) {
+            var element = document.activeElement;
+            if (on) {
+                setTimeout(function () {
+                element.parentNode.classList.add("focus");
+                });
+            } else {
+                let box = document.querySelector(".input-box");
+                box.classList.remove("focus");
+                $("input").each(function () {
+                var $input = $(this);
+                var $parent = $input.closest(".input-box");
+                if ($input.val()) $parent.addClass("focus");
+                else $parent.removeClass("focus");
+                });
+            }
+            }
+</script>
+<script>
+  const spans = document.querySelectorAll('[blockId]');
+  
+  spans.forEach(span => {
+    const blockId = span.getAttribute('blockId');
+    console.log(blockId);
+    fetch(`http://localhost:5000/api/${blockId}/students/count`)
+    .then(response => response.json())
+    .then(data => {
+      span.textContent = data;
+    });
+  });
+  </script>
+
 
 </body>
 

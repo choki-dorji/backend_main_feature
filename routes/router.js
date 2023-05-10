@@ -25,5 +25,6 @@ route.get("/api/blocks", blockController.getBlock);
 route.get("/api/blocks/:id", blockController.getBlockById);
 route.delete("/api/blocks/:id", blockController.delete);
 route.put("/api/blocks/:id", blockController.update);
+route.get("/api/:blockId/students/count", blockController.countStudentsInBlock);
 
 exports.route = route;

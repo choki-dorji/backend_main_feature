@@ -12,6 +12,7 @@ const request = require("./routes/request");
 const student = require("./routes/students");
 const allocate = require("./routes/allocate");
 const chart = require("./routes/chart");
+const RecentActivity = require('./routes/recent')
 const login = require("./routes/login");
 const app = express();
 
@@ -20,6 +21,15 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+// Middleware function to check for token in cookie
+// const checkToken = (req, res, next) => {
+//   const token = req.cookies.token;
+//   if (!token && req.originalUrl !== "/login") {
+//     return res.redirect("/login");
+//   }
+//   next();
+// };
 
 app.use("/", blockRoute.route);
 
@@ -34,6 +44,8 @@ app.use("/request", request.route);
 app.use("/dashboard", chart);
 
 app.use("/login", login);
+
+app.use('/recent', RecentActivity)
 
 // students
 app.use("/students", student.route);

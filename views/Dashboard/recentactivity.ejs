@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 shrink-to-fit=no">
+    <!-- Bootstrap link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    
+    <title>table</title>
+    <style> 
+      .table {
+        width: 90%;
+        margin: 20px auto;
+        color: #858796;
+      }
+
+      .table thead th {
+        background-color: #ff4b13;
+        color: #fff;
+        border-top: none;
+        border-bottom: 1px solid #fff;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .table td, .table th {
+        vertical-align: middle !important;
+      }
+
+      .table td {
+        border-top: none;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Student Name</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Request</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if(recentactivity) {%>
+                  <% for(var i = 0; i < 5; i++) { %>
+                <tr>
+                  <th scope="row"><%=i + 1 %></th>
+                  <td><%= recentactivity[i].student %></td>
+                  <td><%= recentactivity[i].date %></td>
+                  <td><%= recentactivity[i].room %></td>
+                  <td><%= recentactivity[i].Description %></td>
+                </tr>
+                   <% } %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -56,6 +56,8 @@ const Allocation = new mongoose.Schema({
   created: { type: String, required: true },
   academicyear: { type: String, required: true },
   isDisabled: { type: Boolean, required: false },
+  remarks: { type: String, required: false },
+  allocated: { type: String, required: false, default: "yes" },
 });
 
 // Request
@@ -82,9 +84,17 @@ const Request = new mongoose.Schema({
   Requested: { type: Date, required: true },
   image: { type: String },
   clicked: { type: Boolean, required: false },
+  reason: {type: String, required: true}
 });
 
 const RecentActivity = new Schema({
+  student: { type: String, required: true },
+  Description: { type: String, required: true },
+  room: {type: String, required: true},
+  date: { type: Date, required: true },
+});
+
+const removedStudents = new Schema({
   student: { type: String, required: true },
   Description: { type: String, required: true },
   date: { type: Date, required: true },
@@ -96,3 +106,4 @@ exports.AcadYear = mongoose.model("AcadYear", AcadYear);
 exports.Allocation = mongoose.model("Allocation", Allocation);
 exports.Request = mongoose.model("Request", Request);
 exports.RecentActivity = mongoose.model("RecentActivity", RecentActivity);
+exports.removedStudents = mongoose.model("removedStudents", removedStudents);

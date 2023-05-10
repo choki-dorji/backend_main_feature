@@ -17,7 +17,7 @@
 						</div>
 							</a>
 					</div>
-
+					
 
 
 					<% for(var i = 0; i < blocks.length; i++) { %>
@@ -50,9 +50,12 @@
 							</div>
 
 							<div class="student-details pt-4">
-									<h5 class="room-number"><%= sum %></h5>
+								<h5 class="room-number">
+								  <span id="block-total-students" blockId="<%= blocks[i]._id %>"></span>
+								</h5>
 								<span class="tot mt-5">Students</span>
-							</div>
+							  </div>
+							  
 
 							<button class="button mt-4 text-center" onclick="location.href='/view-block?id=<%= blocks[i]._id %>'">
 								<p class="view">View rooms</p>
@@ -330,6 +333,21 @@ $(".delete").click(function() {
 		    });
 		});
 	</script>
+	<script>
+		const spans = document.querySelectorAll('[blockId]');
+	  
+		spans.forEach(span => {
+		  const blockId = span.getAttribute('blockId');
+		  console.log(blockId);
+		  fetch(`http://localhost:5000/api/${blockId}/students/count`)
+			.then(response => response.json())
+			.then(data => {
+				span.textContent = data;
+			});
+		});
+	  </script>
+	  
+	
 
 
 </body>

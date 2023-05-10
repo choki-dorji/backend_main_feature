@@ -91,7 +91,9 @@ exports.UpdateRequest = async (req, res) => {
     const currentRoom = request.room;
     const newRoom = request.targetroom;
 
-    const currRoom = await Room.findOne({ _id: newRoom });
+    const stayingroom = await Room.findById(currentRoom)
+
+    const currRoom  = await Room.findOne({ _id: newRoom });
     const currBlock = await Block.findOne({ _id: request.targetblock });
 
     console.log("newRoom", newRoom);
@@ -124,11 +126,13 @@ exports.UpdateRequest = async (req, res) => {
     request.Remarks = remarks || request.Remarks;
     request.status = "accepted";
     request.clicked = true;
+    request.reason = request.Remarks
 
     // in recent table
     const recent = new RecentActivity({
       student: request.student,
       Description: "Accepted",
+      room: "from "+ stayingroom.room_name + " to "+ currRoom.room_name,
       date: currentDateTime,
     });
     try {
@@ -182,16 +186,32 @@ exports.UpdateRequest = async (req, res) => {
     request.Remarks = remarks || request.Remarks;
     request.status = "Rejected";
     request.clicked = true;
+     request.reason = request.Remarks
     //reject
     const recent = new RecentActivity({
       student: request.student,
       Description: "Rejected",
+      room: "from "+ stayingroom.room_name + " to "+ currRoom.room_name,
       date: currentDateTime,
     });
     try {
       await request.save();
       await recent.save();
       console.log(`Request updated: ${request}`);
+       const mailOptions = {
+        from: "hostelallocations@gmail.com",
+        to: "ceedeejee9@gmail.com",
+        subject: "Request Status Updated",
+        text: `Dear ${request.student_name},\n\nYour request to change room has been rejected to ${request.status}.`,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(`Email sent: ${info.response}`);
+        }
+      });
     } catch (err) {
       console.log(err);
       const error = new HttpError(

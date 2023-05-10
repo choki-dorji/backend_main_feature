@@ -38,6 +38,7 @@ exports.getBlocks = (req, res) => {
       .all([
         axios.get("http://localhost:5000/api/blocks"),
         axios.get("http://localhost:5000/room/api/rooms"),
+        axios.get("http://localhost:5000/recent/recent"),
         axios.get("https://gcit-user-management.onrender.com/api/v1/UM/join", {
           headers: {
             Authorization: "Bearer " + token,
@@ -46,7 +47,7 @@ exports.getBlocks = (req, res) => {
         }),
       ])
       .then(
-        axios.spread(function (blocksResponse, roomsResponse, studentResponse) {
+        axios.spread(function (blocksResponse, roomsResponse, recent, studentResponse) {
           console.log(req.path);
           if (req.path == "/") {
             res.render("blockd/index", {
@@ -76,6 +77,7 @@ exports.getBlocks = (req, res) => {
               blocks: blocksResponse.data,
               rooms: roomsResponse.data,
               students: studentResponse.data,
+              recentactivity: recent.data,
               username: username,
               token: token,
               chart: groupedData,
@@ -119,33 +121,6 @@ exports.getAllocations = (req, res) => {
     });
 };
 // %55555555555555555555555555555555555555555555555%%%%%%%%%%%%%%%%%%%%%%%%5
-
-exports.getStudentsInBlock = (req, res) => {
-  const blockId = req.params.blockId;
-  const currentYear = new Date().getFullYear();
-
-  axios
-    .all([
-      axios.get(`http://localhost:5000/api/allocations/${currentYear}`),
-      axios.get("http://localhost:5000/api/students"),
-    ])
-    .then(
-      axios.spread((allocationsResponse, studentsResponse) => {
-        const allocations = allocationsResponse.data;
-        const students = studentsResponse.data;
-        const studentIds = allocations
-          .filter((allocation) => allocation.blockId === blockId)
-          .map((allocation) => allocation.studentId);
-        const studentCount = studentIds.length;
-
-        res.render("block", { studentCount });
-      })
-    )
-    .catch((err) => {
-      console.log(err);
-      res.send(err);
-    });
-};
 
 exports.getBlockById = (req, res) => {
   const blockId = req.query.id;
@@ -335,14 +310,27 @@ exports.search_room = (req, res) => {
 };
 
 exports.displaycreateallocation = function (req, res) {
-  axios
-    .get("http://localhost:5000/api/blocks")
-    .then(function (blockdata) {
-      res.render("Allocation/createalllocation", { block: blockdata.data });
+  const currentYear = new Date().getFullYear();
+
+  Promise.all([
+    axios.get(`http://localhost:5000/api/blocks`),
+    axios.get(`http://localhost:5000/allocate/api/years/${currentYear}`),
+  ])
+    .then((responses) => {
+      const blockData = responses[0].data;
+      const allocation = responses[1].data;
+      console.log("allocations", allocation);
+      res.render("Allocation/createalllocation", {
+        block: blockData,
+        allocate: allocation,
+      });
     })
     .catch((err) => {
       res.send(err);
     });
+
+
+  
 };
 
 exports.search_roompage = function (req, res) {
@@ -375,3 +363,5 @@ exports.getWholeAllocationYear = function (req, res) {
       res.send(err);
     });
 };
+
+

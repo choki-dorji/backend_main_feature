@@ -27,15 +27,55 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
       blockid: { $in: bid },
       academicyear: currentYear,
     });
+    const existingAllocation1 = await Allocate.findOne({
+      year: years,
+      academicyear: currentYear,
+    });
+    const existingAllocation2 = await Allocate.findOne({
+      blockid: { $in: bid },
+      academicyear: currentYear,
+    });
+
 
     if (existingAllocation) {
       const error = new HttpError(
-        `Rooms have already allocated for year ${years} in block `,
+        `Rooms have already allocated for year ${years} in this block `,
         409
       );
+      console.log(error.message)
+      return res.status(error.code || 500).json({ message: error.message });
+    }
+    if (existingAllocation1) {
+      const error = new HttpError(
+        `Rooms have already allocated for year ${years} `,
+        409
+      );
+      console.log(error.message)
+      return res.status(error.code || 500).json({ message: error.message });
+    }
+     if (existingAllocation2) {
+      const error = new HttpError(
+        `selected block is already used for the allocation`,
+        409
+      );
+      console.log(error.message)
       return res.status(error.code || 500).json({ message: error.message });
     }
   }
+  let veriifyYear;
+  try {
+    veriifyYear = await AcadYear.findOne({ Year: currentYear });
+    console.log("success current year", veriifyYear)
+
+  } catch (e) {
+    const error = new HttpError(`Invalid Operation`, 409);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+    if (!veriifyYear) {
+    throw new Error('Invalid year entered');
+    } 
+
   const allocatedRoomIds = (await Allocate.find({ year: currentYear })).map(
     (allocation) => allocation.roomid
   );
@@ -49,18 +89,14 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
       );
     }
   }
-  try {
-    const veriifyYear = AcadYear.findOne({ Year: currentYear });
-  } catch (e) {
-    const error = new HttpError(`Invalid Operation`, 409);
-    return res.status(error.code || 500).json({ message: error.message });
-  }
+  
 
   try {
     //*********************getting student Data****************************** */
-    const students = await student.GetStudents(req, res, years);
+    // const students = student.GetStudents(req, res, years);
+    const students = student.GetStudents(years);
 
-    console.log(students);
+    console.log("student", students);
     //**********************************grouping students into course******************* */
     const courseGroups = students.reduce((groups, student) => {
       const existingGroup = groups.find(
@@ -87,27 +123,37 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
     }).populate("rooms");
 
     //************************************* get total students either male or female in partivular course****** */
-    let maleLength;
-    let femaleLength;
-    let maleStudents;
-    let femaleStudents;
+    let maleLength = 0;
+    let femaleLength = 0;
+    let maleStudents = [];
+    let femaleStudents = [];
 
     for (const courseGroup of courseGroups) {
-      maleStudents = courseGroup.students.filter((s) => s.gender === "M");
-      femaleStudents = courseGroup.students.filter((s) => s.gender === "F");
-      maleLength = maleStudents.length;
-      femaleLength = femaleStudents.length;
+      maleStudents = maleStudents.concat(
+        courseGroup.students.filter((s) => s.gender === "M")
+      );
+      femaleStudents = femaleStudents.concat(
+        courseGroup.students.filter((s) => s.gender === "F")
+      );
+
+      maleLength += maleStudents.length;
+      femaleLength += femaleStudents.length;
     }
-    console.log("male", maleLength);
-    console.log("female", femaleLength);
 
+    console.log("Total male students:", maleLength);
+    console.log("Total female students:", femaleLength);
+
+    console.log("male students:", maleStudents);
+    console.log("female students:", femaleStudents);
     //************************************* get total capacity of the block  *********************** */
-
     console.log("allocation start");
     let blockId;
     let rooms;
 
     const blocks = [...maleBlocks, ...femaleBlocks];
+
+    // Keep track of rooms already allocated to each student
+    const allocatedRooms = new Map(); // Map<studentId, Set<roomId>>
 
     for (const block of blocks) {
       blockName = block.block_name;
@@ -128,19 +174,17 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
 
       if (totalCapacity > maleLength || totalCapacity > femaleLength) {
         for (const student of [...maleStudents, ...femaleStudents]) {
+          const studentId = student.sid;
+
           // Check if the student has already been allocated to a room
-          const existingAllocation = await Allocate.findOne({
-            student: student._id,
-            AcadYear: currentYear,
-          });
-          console.log("inside for loop & if");
-          if (existingAllocation) {
+          const allocatedRoomIds = allocatedRooms.get(studentId) || new Set();
+          if (allocatedRoomIds.size >= 1) {
+            // student is already allocated to a room
             console.log(
-              `Skipping ${student.name}, already allocated to room ${existingAllocation.room}`
+              `Skipping ${student.name}, already allocated to a room`
             );
             continue;
           }
-          console.log("finished for");
 
           let room;
           console.log("starting for");
@@ -154,7 +198,8 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
                 (student.gender === "F" && roomObj.type === "girls")) &&
               roomObj.availability > 0 &&
               roomObj.isDisabled === false &&
-              roomObj.status === "available"
+              roomObj.status === "available" &&
+              !allocatedRoomIds.has(roomObj._id.toString()) // student is not already allocated to this room
             ) {
               room = r;
               break;
@@ -167,10 +212,18 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
               await Room.findByIdAndUpdate(room, {
                 $inc: { availability: -1 },
               });
+
+              // Update the allocatedRooms map with the allocated room for the student
+              allocatedRooms.set(
+                studentId,
+                allocatedRoomIds.add(room._id.toString())
+              );
+
               console.log(
                 `Allocated ${student.name} to room ${room.room_name}`
               );
             } catch (e) {}
+
             console.log("current year", currentYear);
             const allocate = new Allocate({
               student: student.id,

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 // Block
 const Block = new Schema({
   block_name: { type: String, required: true },
-  no_of_rooms: { type: String, required: true },
+  no_of_rooms: { type: Number, required: true },
   type: { type: String, enum: ["boys", "girls"], required: true },
   status: { type: String, enum: ["available", "unavailable"], required: true },
   rooms: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
@@ -84,13 +84,13 @@ const Request = new mongoose.Schema({
   Requested: { type: Date, required: true },
   image: { type: String },
   clicked: { type: Boolean, required: false },
-  reason: {type: String, required: true}
+  reason: { type: String, required: true },
 });
 
 const RecentActivity = new Schema({
   student: { type: String, required: true },
   Description: { type: String, required: true },
-  room: {type: String, required: true},
+  room: { type: String, required: true },
   date: { type: Date, required: true },
 });
 

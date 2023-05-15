@@ -134,7 +134,7 @@
                         <td><%= i %></td>
                         <td><%= rooms[i].room_name %></td>
                         <td class="mw-100">
-                        
+                          <%= rooms[i].room_capacity %>
                         </td>
                         <td>
                           <p>No students in the room</p>
@@ -204,31 +204,47 @@
 				confirmButtonText: "Remove",
 				preConfirm: () => {
 					// Retrieve the values of the input fields
-					const remarks = document.getElementById('reason').value;
+					const Description = document.getElementById('reason').value;
 				
 					// Return the values as an object
-					return { remarks };
+					return { Description };
 				}
     }).then((result) => {
         if (result.isConfirmed) {
             // Send AJAX request to delete block
-						const {remarks} = result.value;
+						const {Description} = result.value;
 						
 						//
 						//
 						$.ajax({
-								url: `/room/api/room/student/${id}`,
-								method: "PUT",
-								data: { remarks },
+								url: `/students/delete/${id}`,
+								method: "POST",
+								data: { Description },
 								success: function(response) {
-										// If the block was successfully updated, display a success message using Toastify and reload the page
-										Toastify({
-												text: "student was removed successfully!",
-												backgroundColor: "linear-gradient(to right, #96c93d, #00b09b)",
-												className: "success",
-												position:"top-center",
-										}).showToast();
-										window.location.reload();
+                  
+        $.ajax({
+            url: `/room/api/room/student/${id}`,
+            method: "DELETE",
+            success: function() {
+                // Student successfully removed from "allocations" database
+                Toastify({
+                    text: "Student removed from allocations successfully!",
+                    backgroundColor: "#00b09b",
+                    className: "success",
+                    position: "top-center",
+                }).showToast();
+                location.reload();
+            },
+            error: function(error) {
+                // Error removing student from "allocations" database
+                Toastify({
+                    text: "Error removing student from allocations: " + error.responseText,
+                    backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                    className: "error",
+                    position: "top-center",
+                }).showToast();
+            }
+        });									
 								},
 								error: function(error) {
 										// If there was an error updating the block, display an error message using Toastify

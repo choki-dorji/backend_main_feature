@@ -3,6 +3,7 @@ const HttpError = require("../models/httperror");
 const database = require("../models/models");
 const Room = database.Room;
 const Block = database.Block;
+const Allocate = database.Allocation
 
 // create
 exports.createRoom = async (req, res) => {
@@ -61,10 +62,10 @@ exports.createRoom = async (req, res) => {
     sess.startTransaction();
     await createdRoom.save({ session: sess });
     block.rooms.push(createdRoom);
+    block.no_of_rooms += 1;
     await block.save({ session: sess });
     await sess.commitTransaction();
-
-    res.redirect("/add-room");
+    res.status(201).json({message: "room created successfully"})
   } catch (err) {
     console.log(err);
     const error = new HttpError("Creating room failed, please try again", 500);
@@ -173,6 +174,8 @@ exports.searchRoom = async (req, res) => {
   res.json({ room: room.toObject({ getters: true }) });
 };
 
+
+
 //
 exports.getRoomByBlockId = async (req, res, next) => {
   const blockId = req.params.id;
@@ -195,4 +198,52 @@ exports.getRoomByBlockId = async (req, res, next) => {
   }
   // res.json({ room: rooms.map((place) => place.toObject({ getters: true })) });
   res.send(rooms);
+};
+
+
+// exports.getMembersIRoom = async (req, res) => {
+//   const roomid = req.params.id;
+//   const year= new Date().getFullYear();
+
+//   let members;
+//   try{
+//     members = Allocate.find({roomid : roomid, academicyear: year });
+//   }catch(e){
+//      const error = new HttpError("fetching Allocation failed", 500);
+//     // return next(error)
+//     return res.status(error.code || 500).json({ message: error.message });
+//   }
+
+//   if (!members){
+//       const error = new HttpError("Search Not found", 500);
+//     // return next(error)
+//     return res.status(error.code || 500).json({ message: error.message });
+//   }
+
+
+
+//   return res.json(members)
+
+// }
+// const Allocation = require('../models/allocation'); // Assuming you have a model named 'Allocation'
+
+// Controller function to get members in a room for the current year
+exports.getMembersIRoom = async (req, res) => {
+  try {
+    const currentYear = new Date().getFullYear(); // Get the current year
+
+    // Find allocations for the current year
+    const allocations = await Allocate.find({ academicyear: currentYear });
+
+    console.log(allocations)
+
+    // Find the members in the specified room
+    const roomId = req.params.id; // Assuming you pass the roomId as a parameter
+    const membersInRoom = allocations.filter(allocation => String(allocation.roomid) === roomId);
+
+    res.status(200).json({ membersInRoom });
+  } catch (error) {
+    console.error('Error retrieving members in room:', error);
+    res.status(500).json({ error: 'An error occurred while retrieving members in room' });
+  }
 };

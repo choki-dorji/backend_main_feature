@@ -1,4 +1,5 @@
-const axio = require("axios");
+const axios = require("axios");
+const HttpError = require("../models/httperror");
 const multer = require("multer");
 const stud = require("../models/models");
 const Allocate = stud.Allocation;
@@ -6,6 +7,7 @@ const Block = stud.Block;
 const rooms = stud.Room;
 const Request = stud.Request;
 const removedStudents = stud.removedStudents;
+const api_students = require("./apiconnection_lakshay/getStudents");
 
 // get roomm mate
 exports.getRoommates = async (req, res) => {
@@ -36,12 +38,7 @@ exports.getRoommates = async (req, res) => {
   }
 };
 
-// request Hostelchange/////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-exports.hostelChangeRequest = async (req, res) => {
-  const { targetBlock, targetRoom, reason} = req.body;
-  const studentId = req.params.uid;
-  const storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
   },
@@ -49,13 +46,14 @@ exports.hostelChangeRequest = async (req, res) => {
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
-
 const upload = multer({ storage: storage });
-
-
+// request Hostelchange/////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+exports.hostelChangeRequest = async (req, res) => {
+  const { targetBlock, targetRoom, reason, filename } = req.body;
+  const studentId = req.params.uid;
 
   // Assuming the logged-in student's ID is stored in the `id` property of the `req.user` object
- 
 
   try {
     upload.single("filename")(req, res, async function (err) {
@@ -63,6 +61,7 @@ const upload = multer({ storage: storage });
         console.error(err);
         return res.status(500).json({ message: "File upload failed" });
       }
+      const fileName = filename;
 
       let block;
       // Check if the specified block exists
@@ -72,9 +71,8 @@ const upload = multer({ storage: storage });
         return res.status(404).json({ message: "Block not found" });
       }
 
-      const fileName = req.file.filename
-      console.log(fileName)
-
+      // const fileName = req.file ? req.file.filename : null;
+      // console.log(fileName);
 
       // Check if the specified room exists in the specified block
       const room = await rooms.findOne({
@@ -181,32 +179,100 @@ const upload = multer({ storage: storage });
 // //////////////
 exports.editstudents = async (req, res) => {
   const studentId = req.params.id;
-  const remarks = req.body.remarks;
 
   try {
-    const updatedStudent = await Allocate.findOneAndUpdate(
-      { sid: studentId },
-      { allocated: "No", remarks: remarks },
-      { new: true }
-    );
+    const deletedStudent = await Allocate.findOneAndDelete({ sid: studentId });
 
-    if (!updatedStudent) {
+    if (!deletedStudent) {
       return res.status(404).send({
         message: `Cannot update allocation and remarks for student with sid ${studentId}. Maybe sid is wrong`,
       });
     }
 
     res.send({
-      message: "Student allocation and remarks were updated successfully!",
+      message: "Student was deleted successfully!",
     });
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .send({
-        message:
-          "Could not update student allocation and remarks with sid=" +
-          studentId,
-      });
+    res.status(500).send({
+      message: "Could not delete student " + studentId,
+    });
+  }
+};
+
+// ///////////search students
+// searchStudentsByName/////////////////////////////////////////////////////////////////////
+
+exports.searchStudentsBySID = async (req, res) => {
+  const token = req.cookies.tokenABC;
+  const studentSID = req.query.studentSID;
+
+  console.log(token);
+
+  if (!studentSID) {
+    const error = new HttpError("Missing query parameter: studentSID", 400);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  try {
+    const response = await axios.get(
+      `https://gcit-user-management.onrender.com/api/v1/UM/sid/${studentSID}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const students = response.data;
+
+    if (students.length === 0) {
+      const error = new HttpError(
+        `No students found with the SID '${studentSID}'`,
+        404
+      );
+      return res.status(error.code || 500).json({ message: error.message });
+    }
+
+    res.send(students);
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError(
+      "Something went wrong, could not search for students",
+      500
+    );
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+};
+
+exports.countStudentsByYear = (req, res) => {
+  const years = req.params.years;
+
+  const students = api_students.countStudentsByYear(years);
+
+  res.send(students);
+};
+
+// delete students
+exports.createRemovedStudent = async (req, res) => {
+  const student = req.params.students;
+  try {
+    const { Description } = req.body;
+
+    // Create a new removed student document
+    const newRemovedStudent = new removedStudents({
+      student: student,
+      Description,
+      date: new Date(),
+    });
+
+    // Save the document to the database
+    await newRemovedStudent.save();
+    res.status(201).json({
+      message: "Removed student successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create removed student" });
   }
 };

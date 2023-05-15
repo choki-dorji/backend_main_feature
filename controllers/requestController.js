@@ -13,8 +13,10 @@ const RecentActivity = stdb.RecentActivity;
 
 // get request by date
 exports.getAllhostelChangeRequest = async (req, res) => {
+  const token = req.cookies.tokenABC
   try {
     const viewMore = req.query.viewMore === "true"; // Check if view more button was clicked
+    const notificationCount = await Request.countDocuments({ clicked: false });
 
     let requests;
     if (viewMore) {
@@ -34,6 +36,8 @@ exports.getAllhostelChangeRequest = async (req, res) => {
           blocks: block,
           rooms: room,
           requests: requests,
+          token: token,
+          notificationCount: notificationCount,
         });
       })
       .catch((err) => {
@@ -58,6 +62,12 @@ const transporter = nodemailer.createTransport({
     pass: "pzeqibrcubljtdrj",
   },
 });
+
+
+
+
+
+
 // update request////////////////////////////////////////////////////////////////////////
 exports.UpdateRequest = async (req, res) => {
   const requestId = req.params.id;

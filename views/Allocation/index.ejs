@@ -168,7 +168,7 @@
   margin-left: 2%;
   color: #4f4f4f;
   border-spacing:0;
-  
+
 }
 
 #block11 .table td,
@@ -224,7 +224,7 @@
     padding: 4px 4px 4px px;
     border-radius: 3px;
     font-size: 12px;
-    
+
   }
 
   .pre {
@@ -234,7 +234,7 @@
     margin-left: 5%;
     font-size: 14px;
     margin-top: -20px;
-    
+
   }
   .table {
     margin-top: 1rem;
@@ -280,7 +280,10 @@ margin-left:4.9rem;
 
   }
 }
-
+.failed{
+    border-radius: 15px;
+    margin-top: 15px;
+}
 
  </style>
 
@@ -292,34 +295,38 @@ margin-left:4.9rem;
           <div class="form-group pt-2">
             <label for="exampleSelect" class="mt-3">Select year:</label>
             <select class="form-select" id="yearSelect">
+              <option value="" disabled selected>year</option>
               <% for(var i = 0; i < Acad.length; i++) { %>
                 <option value="<%= Acad[i].Year %>"><%= Acad[i].Year %></option>
               <% } %>
             </select>
-            
+
           </div>
           <button class="button2 text-center" id="createAcademicYearBtn"><p class="view view1">Create academic year</p></button>
         </div>
       </div>
       <div class="col-lg-12 col-md-12 col-sm-12 block1">
-        
+
         <div class="shadow-box1">
-             
+
+          <p id="descriptionElement" style="margin-left: 200px">
+            Description
+          </p>
           <br><br>
           <h6 class="pre">Previous allocation</h6>
+
           <a class="" href="" style="cursor:pointer;">
-            <div class="pdf text-left">
-              <p class="download mt-2 ml-3">Download</p>
-              <i class="bi bi-file-earmark-pdf pdff"></i>
-              
+            <div class="pdf text-left" >
+                    <p id="downloadBtn" class="download mt-2 ml-3">Download</p>
+                    <i class="fa fa-file-pdf-o pdff" aria-hidden="true" style="padding-top: 8px;"></i>
             </div>
           </a>
           <br>
-          
+
           <div class="col-lg-12 col-md-12 col-sm-12">
             <div class="table-responsive">
              <%- include('./table.ejs') %>
-                
+
               <hr>
               <br>
             </div>
@@ -336,6 +343,26 @@ margin-left:4.9rem;
 </main>
 
 </section>
+<!-- <script>
+  // JavaScript code
+  const descriptionElement = document.querySelector("#descriptionElement");
+  const yearSelect = document.querySelector("#yearSelect");
+
+  yearSelect.addEventListener("change", async () => {
+    const selectedYear = yearSelect.value;
+    const response = await fetch("http://localhost:5000/year/allocations");
+    const data = await response.json();
+
+    const filteredData = data.find((item) => item.Year === selectedYear);
+
+    if (filteredData) {
+      descriptionElement.textContent = filteredData.Description;
+    } else {
+      descriptionElement.textContent = "";
+    }
+  });
+</script> -->
+
 
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -344,11 +371,12 @@ margin-left:4.9rem;
   document.getElementById('createAcademicYearBtn').addEventListener('click', function() {
     Swal.fire({
   html:`
-  <h5>Academic Year</h5>
+    <h5 style="margin-bottom: 30px">Academic Year</h5>
 								<form>
+
 										<div class="form-group">
 												<div class="input-box">
-														<label class="input-label">Acadamic year</label>
+														<label class="input-label" >Acadamic year</label>
 														<input type="integer" class="input-1" onfocus="setFocus(true)" id="acadyear" onblur="setFocus(false)" />
 												</div>
 
@@ -357,11 +385,12 @@ margin-left:4.9rem;
 														<input type="textarea" class="input-1" onfocus="setFocus(true)" id="description" onblur="setFocus(false)" />
 												</div>
 										</div>
-								</form>			
+								</form>
   `,
   showCancelButton: true,
   confirmButtonText: 'Create',
   cancelButtonText: 'Cancel',
+
   preConfirm: () => {
 									    // Retrieve the values of the input fields
 									    const year = document.getElementById('acadyear').value;
@@ -379,7 +408,7 @@ margin-left:4.9rem;
 										// If the block was successfully updated, display a success message using Toastify and reload the page
 										Toastify({
 												text: "Successfully Created Academic Year",
-												backgroundColor: "linear-gradient(to right, #96c93d, #00b09b)",
+												backgroundColor: "#00b09b",
 												className: "success",
 												position:"top-center",
 										}).showToast();
@@ -388,12 +417,16 @@ margin-left:4.9rem;
 								},
 								error: function(error) {
 										// If there was an error updating the block, display an error message using Toastify
-										Toastify({
-												text: "Error Creating Academic year " + error.responseText,
-												backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
-												className: "error",
-												position:"top-center",
-										}).showToast();
+										 Toastify({
+                      text: `Already created academic year session for ${year} `,
+                      duration: 3000, // Display for 3 seconds
+                      gravity: 'top', // Display at the top of the screen
+                      position: 'center',
+                      className: "failed", // Display in the center of the screen
+                      backgroundColor: ' #ff416c', // Set a gradient background color
+                      stopOnFocus: true, // Stop the countdown when the user focuses on the screen
+                      onClick: function() { Toastify.hideAll() } // Hide all toasts when clicked
+                    }).showToast();
 								}
 						});
   }
@@ -434,15 +467,13 @@ margin-left:4.9rem;
   yearSelect.addEventListener("change", () => {
     const year = yearSelect.value;
     const curyear =  new Date().getFullYear().toString();
-    
+
     if(year === curyear) {
     fetch(`/Allocate/api/years/${year}`)
       .then((response) => response.json())
       .then((data) => {
         let tableHTML = "";
         data.forEach((allocation, index) => {
-         
-         
           tableHTML += `
             <tr>
               <td>${index + 1}</td>
@@ -454,7 +485,7 @@ margin-left:4.9rem;
               <td>${allocation.academicyear}</td>
             </tr>
           `;
-          
+
         });
         allocationTable.innerHTML = `
           <thead>
@@ -478,7 +509,7 @@ margin-left:4.9rem;
       .then((data) => {
         let tableHTML = "";
         data.forEach((allocation, index) => {
-         
+
           tableHTML += `
             <tr>
               <td>${index + 1}</td>
@@ -490,7 +521,7 @@ margin-left:4.9rem;
               <td>${allocation.academicyear}</td>
             </tr>
           `;
-          
+
         });
         allocationTable.innerHTML = `
           <thead>
@@ -508,7 +539,7 @@ margin-left:4.9rem;
         `;
       })
       .catch((error) => console.error(error));
-    
+
 
     }
   });
@@ -536,6 +567,46 @@ if (event.target == modal) {
 }
 }
 </script>
+   <script>
+      document.getElementById('downloadBtn').addEventListener('click', () => {
+        // Create an HTML string for the content you want in the PDF
+        const html = `
+          <html>
+            <head>
+              <style>
+                /* Add your CSS styles here */
+              </style>
+            </head>
+            <body>
+              <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="table-responsive">
+                  <%- include('./table.ejs') %>
+                  <hr>
+                  <br>
+                </div>
+              </div>
+            </body>
+          </html>
+        `;
+
+        // Encode the HTML content as Base64
+        const encodedHtml = btoa(unescape(encodeURIComponent(html)));
+
+        // Create a data URL for the encoded HTML
+        const dataUrl = `data:text/html;base64,${encodedHtml}`;
+
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'output.pdf';
+
+        // Programmatically click the link to trigger the download
+        link.click();
+
+        // Cleanup
+        document.body.removeChild(link);
+      });
+    </script>
 
 </body>
 
@@ -662,7 +733,7 @@ input[type="submit"]:hover {
             <a href="/allocate/all?year=<%= Acad[i].Year %>"><%= Acad[i].Year %></a>
         <% } %>
         <button id="create-year-button">Create new Acad year</button>
-    
+
         <div id="popup-form" class="popup-form">
             <div class="form-container">
                 <span class="close" onclick="closeForm()">&times;</span>
@@ -676,26 +747,26 @@ input[type="submit"]:hover {
                 </form>
             </div>
         </div>
-    
-                
+
+
         <script>
             // Get the button and the popup form
             const createYearButton = document.getElementById("create-year-button");
             const popupForm = document.getElementById("popup-form");
-        
+
             // Add an event listener to the button that will display the popup form when clicked
             createYearButton.addEventListener("click", () => {
                 popupForm.style.display = "block";
             });
-        
+
             // Add a function to close the popup form when the close button is clicked
             function closeForm() {
                 popupForm.style.display = "none";
             }
-        
+
             // Add a function to submit the form
             function submitForm(event) {
-  event.preventDefault(); 
+  event.preventDefault();
 
 
   const year = document.getElementById("year").value;
@@ -723,7 +794,7 @@ input[type="submit"]:hover {
 }
 
            </script>
-        
-    
+
+
 </body>
 </html> -->

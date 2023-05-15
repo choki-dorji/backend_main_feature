@@ -1,11 +1,31 @@
 const axios = require("axios");
 const userSession = require("../global");
+const request = require("../models/models");
+const Request = request.Request;
 
-exports.add_room = (req, res) => {
-  res.render("rooms/add_room");
+exports.add_room = async (req, res) => {
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
+  axios
+    .get("http://localhost:5000/api/blocks")
+    .then(function (blockdata) {
+      res.render("rooms/add_room", {
+        block: blockdata.data,
+        token: token,
+        notificationCount: notificationCount,
+        username: username.name,
+      });
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 };
 
-exports.getBlock = (req, res) => {
+exports.getBlock = async (req, res) => {
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
   axios
     .all([
       axios.get("http://localhost:5000/api/blocks"),
@@ -16,6 +36,9 @@ exports.getBlock = (req, res) => {
         res.render("blockd/index", {
           blocks: blocksResponse.data,
           rooms: roomsResponse.data,
+          token: token,
+          notificationCount: notificationCount,
+          username: username.name,
         });
       })
     )
@@ -25,11 +48,13 @@ exports.getBlock = (req, res) => {
     });
 };
 
-exports.getBlocks = (req, res) => {
+exports.getBlocks = async (req, res) => {
   console.log("inside getBlocks");
-  const username = req.query.username;
+  const notificationCount = await Request.countDocuments({ clicked: false });
   const token = req.query.token;
   const err = req.query.error;
+  const username = req.query.username;
+
   const currentYear = new Date().getFullYear();
   console.log("before axios");
 
@@ -47,13 +72,20 @@ exports.getBlocks = (req, res) => {
         }),
       ])
       .then(
-        axios.spread(function (blocksResponse, roomsResponse, recent, studentResponse) {
+        axios.spread(function (
+          blocksResponse,
+          roomsResponse,
+          recent,
+          studentResponse
+        ) {
           console.log(req.path);
           if (req.path == "/") {
             res.render("blockd/index", {
               blocks: blocksResponse.data,
               rooms: roomsResponse.data,
               students: studentResponse.data,
+              notificationCount: notificationCount,
+              // username: username,
             });
           } else {
             let groupedData = {};
@@ -81,6 +113,8 @@ exports.getBlocks = (req, res) => {
               username: username,
               token: token,
               chart: groupedData,
+              notificationCount: notificationCount,
+              username: username,
             });
           }
         })
@@ -95,8 +129,11 @@ exports.getBlocks = (req, res) => {
 };
 // Allocations
 
-exports.getAllocations = (req, res) => {
+exports.getAllocations = async (req, res) => {
   const currentYear = new Date().getFullYear();
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
 
   axios
     .all([
@@ -112,7 +149,11 @@ exports.getAllocations = (req, res) => {
           .map((allocation) => allocation.studentId);
         const studentCount = studentIds.length;
 
-        res.render("block", { studentCount });
+        res.render("block", {
+          studentCount,
+          notificationCount: notificationCount,
+          username: username.name,
+        });
       })
     )
     .catch((err) => {
@@ -122,9 +163,11 @@ exports.getAllocations = (req, res) => {
 };
 // %55555555555555555555555555555555555555555555555%%%%%%%%%%%%%%%%%%%%%%%%5
 
-exports.getBlockById = (req, res) => {
+exports.getBlockById = async (req, res) => {
   const blockId = req.query.id;
   const currentYear = new Date().getFullYear();
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
 
   Promise.all([
     axios.get(`http://localhost:5000/api/blocks/${blockId}`),
@@ -140,6 +183,8 @@ exports.getBlockById = (req, res) => {
         block: blockData,
         rooms: roomsData,
         allocate: allocation,
+        notificationCount: notificationCount,
+        username: username.name,
       });
     })
     .catch((err) => {
@@ -147,11 +192,19 @@ exports.getBlockById = (req, res) => {
     });
 };
 
-exports.update_block = (req, res) => {
+exports.update_block = async (req, res) => {
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
   axios
     .get("http://localhost:5000/api/blocks", { params: { id: req.query.id } })
     .then(function (blockdata) {
-      res.render("blockd/index", { block: blockdata.data });
+      res.render("blockd/index", {
+        block: blockdata.data,
+        token: token,
+        notificationCount: notificationCount,
+        username: username.name,
+      });
     })
     .catch((err) => {
       res.send(err);
@@ -163,13 +216,21 @@ exports.update_block = (req, res) => {
 /////////////////Rooms /////////////////////////
 
 // get rooms
-exports.getRooms = (req, res) => {
+exports.getRooms = async (req, res) => {
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
   // Make a get request to /api/users
   axios
     .get("http://localhost:5000/room/api/rooms")
     .then(function (response) {
       // console.log(response);
-      res.render("getroom", { room: response.data });
+      res.render("getroom", {
+        room: response.data,
+        token: token,
+        notificationCount: notificationCount,
+        username: username.name,
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -177,9 +238,12 @@ exports.getRooms = (req, res) => {
     });
 };
 // getallocation
-exports.getAllocationbyId = (req, res) => {
+exports.getAllocationbyId = async (req, res) => {
   const year = req.query.year;
   console.log(year);
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
 
   axios
     .get(`http://localhost:5000/allocate/api/years/${year}`)
@@ -188,6 +252,9 @@ exports.getAllocationbyId = (req, res) => {
       console.log("data", blockData);
       res.render("Allocation/allocate", {
         allocate: blockData,
+        token: token,
+        notificationCount: notificationCount,
+        username: username.name,
       });
     })
     .catch((err) => {
@@ -196,13 +263,21 @@ exports.getAllocationbyId = (req, res) => {
 };
 
 // uodate
-exports.update_room = (req, res) => {
+exports.update_room = async (req, res) => {
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
   axios
     .get("http://localhost:5000/room/api/rooms", {
       params: { id: req.query.id },
     })
     .then(function (blockdata) {
-      res.render("update_room", { room: blockdata.data });
+      res.render("update_room", {
+        room: blockdata.data,
+        token: token,
+        notificationCount: notificationCount,
+        username: username.name,
+      });
     })
     .catch((err) => {
       res.send(err);
@@ -224,8 +299,9 @@ exports.add_Allocation = (req, res) => {
 ////////////////////////////////
 /////////// chart ...///////////
 
-exports.getchart = (req, res) => {
+exports.getchart = async (req, res) => {
   // Make a get request to /api/users
+  const username = req.cookies.userData;
   axios
     .get("http://localhost:5000/chart")
     .then(function (response) {
@@ -296,49 +372,66 @@ exports.getchart = (req, res) => {
 };
 
 // search room
-exports.search_room = (req, res) => {
+exports.search_room = async (req, res) => {
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
   axios
     .get("http://localhost:5000/room/api/rooms", {
       params: { id: req.query.id },
     })
     .then(function (blockdata) {
-      res.render("search/searchroom", { room: blockdata.data });
-    })
-    .catch((err) => {
-      res.send(err);
-    });
-};
-
-exports.displaycreateallocation = function (req, res) {
-  const currentYear = new Date().getFullYear();
-
-  Promise.all([
-    axios.get(`http://localhost:5000/api/blocks`),
-    axios.get(`http://localhost:5000/allocate/api/years/${currentYear}`),
-  ])
-    .then((responses) => {
-      const blockData = responses[0].data;
-      const allocation = responses[1].data;
-      console.log("allocations", allocation);
-      res.render("Allocation/createalllocation", {
-        block: blockData,
-        allocate: allocation,
+      res.render("search/searchroom", {
+        room: blockdata.data,
+        notificationCount: notificationCount,
       });
     })
     .catch((err) => {
       res.send(err);
     });
-
-
-  
 };
 
-exports.search_roompage = function (req, res) {
-  res.render("search/searchroom");
+exports.displaycreateallocation = async function (req, res) {
+  const currentYear = new Date().getFullYear();
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
+
+  Promise.all([
+    axios.get(`http://localhost:5000/api/blocks`),
+    axios.get(`http://localhost:5000/allocate/api/years/${currentYear}`),
+    axios.get("http://localhost:5000/room/api/rooms"),
+  ])
+    .then((responses) => {
+      const blockData = responses[0].data;
+      const allocation = responses[1].data;
+      const roomresponse = responses[2].data;
+      console.log("allocations", allocation);
+      res.render("Allocation/createalllocation", {
+        block: blockData,
+        allocate: allocation,
+        token: token,
+        room: roomresponse,
+        notificationCount: notificationCount,
+        username: username.name,
+      });
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 };
 
-exports.getWholeAllocationYear = function (req, res) {
+exports.search_roompage = async function (req, res) {
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  res.render("search/searchroom", { token: token, username: username });
+};
+
+exports.getWholeAllocationYear = async function (req, res) {
   const year = req.query.year;
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
 
   Promise.all([
     axios.get(`http://localhost:5000/year/allocations`),
@@ -357,6 +450,10 @@ exports.getWholeAllocationYear = function (req, res) {
         allocate: AllocateData,
         room: room,
         blocks: blocks,
+        token,
+        token,
+        notificationCount: notificationCount,
+        username: username.name,
       });
     })
     .catch((err) => {
@@ -364,4 +461,60 @@ exports.getWholeAllocationYear = function (req, res) {
     });
 };
 
+exports.disable = async (req, res) => {
+  const currentYear = new Date().getFullYear();
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
+  Promise.all([
+    axios.get(`http://localhost:5000/api/blocks`),
+    axios.get(`http://localhost:5000/allocate/api/years/${currentYear}`),
+    axios.get("http://localhost:5000/room/api/rooms"),
+  ])
+    .then((responses) => {
+      const blockData = responses[0].data;
+      const allocation = responses[1].data;
+      const roomresponse = responses[2].data;
+      console.log("allocations", allocation);
+      res.render("disability/index", {
+        block: blockData,
+        allocate: allocation,
+        token: token,
+        room: roomresponse,
+        notificationCount: notificationCount,
+        username: username.name,
+      });
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+};
 
+exports.disableF = async (req, res) => {
+  const currentYear = new Date().getFullYear();
+  const token = req.cookies.tokenABC;
+  const username = req.cookies.userData;
+  const notificationCount = await Request.countDocuments({ clicked: false });
+  Promise.all([
+    axios.get(`http://localhost:5000/api/blocks`),
+    axios.get(`http://localhost:5000/allocate/api/years/${currentYear}`),
+    axios.get("http://localhost:5000/room/api/rooms"),
+  ])
+    .then((responses) => {
+      const blockData = responses[0].data;
+      const allocation = responses[1].data;
+      const roomresponse = responses[2].data;
+      console.log("allocations", allocation);
+      res.render("disability/indexfemale", {
+        block: blockData,
+        allocate: allocation,
+        token: token,
+        room: roomresponse,
+        notificationCount: notificationCount,
+        username: username.name,
+      });
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+};

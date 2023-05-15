@@ -4,6 +4,7 @@ const { validationResult } = require("express-validator");
 const HttpError = require("../models/httperror");
 const database = require("../models/models");
 const Block = database.Block;
+const Room = database.Room
 const Allocate = database.Allocation;
 
 // create
@@ -49,7 +50,7 @@ exports.createBlock = async (req, res, next) => {
 
   try {
     await createdBlock.save();
-    // res.redirect("/");
+    res.redirect("/");
   } catch (err) {
     console.log(err);
     const error = new HttpError("creating Block failed, please try again", 500);
@@ -103,53 +104,80 @@ exports.getBlockById = async (req, res, next) => {
 };
 
 // delete
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
 
-  Block.findByIdAndDelete(id)
-    .then((data) => {
-      if (!data) {
-        res
-          .status(404)
-          .send({ message: `Cannot Delete with id ${id}. Maybe id is wrong` });
-      } else {
-        res.send({
-          message: "Block was deleted successfully!",
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: "Could not delete Block with id=" + id,
-      });
-    });
+  try {
+    const deletedBlock = await Block.findByIdAndDelete(id);
+
+    if (!deletedBlock) {
+      return res.status(404).send({ message: `Cannot delete block with ID ${id}. Maybe the ID is wrong` });
+    }
+
+    // Delete the rooms associated with the block
+    await Room.deleteMany({ blockid: id });
+
+    res.send({ message: "Block and associated rooms were deleted successfully!" });
+  } catch (err) {
+    res.status(500).send({ message: `Could not delete block with ID ${id}` });
+  }
 };
+
 
 // get block by particulat id
 
 // update
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   console.log("inside update block");
   if (!req.body) {
     return res.status(400).send({ message: "Data to update can not be empty" });
   }
 
+  const { block_name, type, status } = req.body;
   const id = req.params.id;
-  // console.log(id);
-  Block.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
-    .then((data) => {
+
+  let existingBlock;
+  try {
+    existingBlock = await Block.findOne({ block_name: block_name });
+  } catch (err) {
+    const error = new HttpError("Updating Block Failed, Try again later", 500);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  if (existingBlock && existingBlock._id.toString() !== id) {
+    const error = new HttpError(
+      "Block with the provided name already exists",
+      422
+    );
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  // Update block details
+  const blockUpdate = { block_name, type, status };
+
+  Block.findByIdAndUpdate(id, blockUpdate, { useFindAndModify: false })
+    .then(async (data) => {
       if (!data) {
         res.status(404).send({
-          message: `Cannot Update user with ${id}. Maybe user not found!`,
+          message: `Cannot update block with ID ${id}. Block not found!`,
         });
       } else {
+        // Update room types
+        await Room.updateMany(
+          { blockid: id },
+          { $set: { type: type } },
+          { multi: true }
+        );
+
         res.send(data);
       }
     })
     .catch((err) => {
-      res.status(500).send({ message: "Error Update user information" });
+      console.log(err)
+      res.status(500).send({ message: "Error updating block information" });
     });
 };
+
 
 // /////total students in block
 exports.countStudentsInBlock = async (req, res) => {

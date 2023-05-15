@@ -1,4 +1,18 @@
 <%- include('../required/header') %>
+<style>
+	.error{
+    border-radius: 15px;
+    margin-top: 27px;
+}
+.toastify-success {
+  color: #fff;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
+  width: "90%";
+}
+.toastify-success .toastify-text {
+  border-bottom: 2px solid #00b894;
+}
+ </style>
 
 	<main>
 			<main id="block">
@@ -17,7 +31,7 @@
 						</div>
 							</a>
 					</div>
-					
+
 
 
 					<% for(var i = 0; i < blocks.length; i++) { %>
@@ -36,9 +50,12 @@
 							<div class="block-details">
 								<i class="material-icons icon"><%= blocks[i].type %></i>
 								<h5 class="bname"><%= blocks[i].block_name %></h5>
+
 								<a class="edit" data-id=<%= blocks[i]._id%> >
                   <span class="text-gradient"><i class="bx bx-edit edit-icon" id="edit-btn"></i></span>
                 </a>
+
+
                 <a class="delete" data-id=<%= blocks[i]._id%> >
                   <span class="text-gradient"><i class="bx bx-trash trash-icon"></i></span>
                 </a>
@@ -50,16 +67,14 @@
 							</div>
 
 							<div class="student-details pt-4">
-								<h5 class="room-number">
-								  <span id="block-total-students" blockId="<%= blocks[i]._id %>"></span>
-								</h5>
+									<h5 class="room-number"  blockId="<%= blocks[i]._id %>"></h5>
 								<span class="tot mt-5">Students</span>
-							  </div>
-							  
+							</div>
 
 							<button class="button mt-4 text-center" onclick="location.href='/view-block?id=<%= blocks[i]._id %>'">
 								<p class="view">View rooms</p>
 							</button>
+
 							<!-- <a href="/view-block?id=<%= blocks[i]._id%>" class="btn border-shadow update">
 								<span class="text-gradient"><i class="fas fa-pencil-alt"></i>njrhbjhbfjahb</span>
 							</a> -->
@@ -136,21 +151,33 @@ $(".add").click(function() {
 								success: function(response) {
 										// If the block was successfully updated, display a success message using Toastify and reload the page
 										Toastify({
-												text: "Block created successfully!",
-												backgroundColor: "linear-gradient(to right, #96c93d, #00b09b)",
-												className: "success",
-												position:"top-center",
-										}).showToast();
-										window.location.reload();
+									      text: 'Block created Successfully',
+									      duration: 3000, // Display for 3 seconds
+									      gravity: 'top', // Display at the top of the screen
+									      position: 'center', // Display in the center of the screen
+									      backgroundColor: '#00C853', // Set the background color to white
+									      className: 'toastify-success', // Add a custom CSS class for styling
+									      stopOnFocus: true, // Stop the countdown when the user focuses on the screen
+									      onClick: function() { Toastify.hideAll() } // Hide all toasts when clicked
+									    }).showToast();
+
+									    // Navigate to a different page after the success message is displayed
+										location.reload();
 								},
 								error: function(error) {
 										// If there was an error updating the block, display an error message using Toastify
-										Toastify({
-												text: "Error updating block: " + error.responseText,
-												backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
-												className: "error",
-												position:"top-center",
-										}).showToast();
+
+										  Toastify({
+									          text: 'error creating block' + error.responseText,
+									          duration: 3000, // Display for 3 seconds
+									          gravity: 'top', // Display at the top of the screen
+									          position: 'center',
+									          className: "failed", // Display in the center of the screen
+									          backgroundColor: '#ff416c', // Set a gradient background color
+									          stopOnFocus: true, // Stop the countdown when the user focuses on the screen
+									          onClick: function() { Toastify.hideAll() } // Hide all toasts when clicked
+									        }).showToast();
+
 								}
 						});
 
@@ -186,19 +213,23 @@ $(".delete").click(function() {
                 method: "DELETE",
                 success: function(response) {
                     // If the block was successfully deleted, display a success message using Toastify and reload the page
-                    Toastify({
-                        text: "Block deleted successfully!",
-                        backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
-                        className: "success",
-												position:"top-center",
-                    }).showToast();
-                    location.reload();
+                   Toastify({
+									      text: 'Block Deleted Successfully',
+									      duration: 3000, // Display for 3 seconds
+									      gravity: 'top', // Display at the top of the screen
+									      position: 'center', // Display in the center of the screen
+									      backgroundColor: '#00C853', // Set the background color to white
+									      className: 'toastify-success', // Add a custom CSS class for styling
+									      stopOnFocus: true, // Stop the countdown when the user focuses on the screen
+									      onClick: function() { Toastify.hideAll() } // Hide all toasts when clicked
+									    }).showToast();
+									    location.reload();
                 },
                 error: function(error) {
                     // If there was an error deleting the block, display an error message using Toastify
                     Toastify({
                         text: "Error deleting block: " + error.responseText,
-                        backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                        backgroundColor: " #ff5f6d",
                         className: "error",
 												position:"top-center",
                     }).showToast();
@@ -260,7 +291,7 @@ $(".delete").click(function() {
 
 		                                <div class="input-box">
 		                                    <label class="input-label">Number of Rooms</label>
-		                                    <input type="text" class="input-1" onfocus="setFocus(true)" id="num-rooms" onblur="setFocus(false)" disabled value="${response.rooms.length}" />
+		                                    <input type="text" class="input-1" onfocus="setFocus(true)" id="num-rooms" onblur="setFocus(false)" disabled value="${response.rooms.length}"/>
 		                                </div>
 
 		                                <div class="input-box active-grey">
@@ -303,7 +334,7 @@ $(".delete").click(function() {
 															// If the block was successfully updated, display a success message using Toastify and reload the page
 															Toastify({
 																	text: "Block updated successfully!",
-																	backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+																	backgroundColor: "#00b09b",
 																	className: "success",
 																	position:"top-center",
 															}).showToast();
@@ -313,7 +344,7 @@ $(".delete").click(function() {
 															// If there was an error updating the block, display an error message using Toastify
 															Toastify({
 																	text: "Error updating block: " + error.responseText,
-																	backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+																	backgroundColor: "#ff5f6d",
 																	className: "error",
 																	position:"top-center",
 															}).showToast();
@@ -334,20 +365,19 @@ $(".delete").click(function() {
 		});
 	</script>
 	<script>
-		const spans = document.querySelectorAll('[blockId]');
-	  
-		spans.forEach(span => {
-		  const blockId = span.getAttribute('blockId');
-		  console.log(blockId);
-		  fetch(`http://localhost:5000/api/${blockId}/students/count`)
-			.then(response => response.json())
-			.then(data => {
-				span.textContent = data;
-			});
-		});
-	  </script>
-	  
-	
+		 const spans = document.querySelectorAll('[blockId]');
+
+  spans.forEach(span => {
+    const blockId = span.getAttribute('blockId');
+    console.log(blockId);
+    fetch(`http://localhost:5000/api/${blockId}/students/count`)
+    .then(response => response.json())
+    .then(data => {
+      span.textContent = data;
+    });
+  });
+	</script>
+
 
 
 </body>

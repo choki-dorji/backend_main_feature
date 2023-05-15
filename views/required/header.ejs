@@ -54,11 +54,39 @@
 	<link rel="stylesheet" href="/css/index.css">
   <link rel="stylesheet" href="/css/chart.css">
   <link rel="stylesheet" href="/css/view_block.css">
-  <link rel="stylesheet" href="/css/alloc.css">
-  <link rel="stylesheet" href="/css/room_alloc.css">
+   <link rel="stylesheet" href="/css/room_alloc.css">
   <link rel="stylesheet" href="/css/request.css">
+  <link rel="stylesheet" href="/css/searchh.css">
+	<link rel="stylesheet" href="/css/disability.css">
+
 	<title>Hostel Allocation</title>
+	<style>
+	.search-results-container {
+  display: none;
+  position: absolute;
+  background-color: #ccc;
+  border-radius: 9px;
+  width: 25%;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  margin-left: 250px;
+}
+
+/* Style for each search result item */
+.search-results div {
+  padding: 10px;
+  cursor: pointer;
+}
+
+/* Style when hovering over a search result item */
+.search-results div:hover {
+  background-color: #f0f0f0;
+}
+	</style>
 </head>
+
 
 <body>
 
@@ -69,10 +97,12 @@
 
 		<ul class="side-menu">
 			<li class="list">
-           <a href="http://localhost:5000/dashboard/dash?username=group12&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFlM2ZkMGUzLTcyMDktNDk5ZS1hNTU1LWYxMmU5OGI2ZjYwNiIsImlhdCI6MTY4MzYzOTc3NCwiZXhwIjoxNjkxNDE1Nzc0fQ.fUw2v1b3GgZEZV4-XMrfdhyLDMnzef8jJlFPK95PwBU" class="nav-link">
+
+           <a href="/dashboard/dash?token=<%= locals.token %>" class="nav-link">
 					<i class='bx bx-grid-alt me-5 icon housee'></i>
 					<span class="link">Dashboard</span>
 				</a>
+
 			</li>
 			<li class="list">
 				<a href="/" onclick="activateLink(this)" class="nav-link">
@@ -102,16 +132,19 @@
 				<a href="/request" onclick="activateLink(this)" class="nav-link">
 					<i class='bx bx-message-square-dots icon housee'></i>
 					<span class="link"> Request</span>
+          <% if(notificationCount > 0) { %>
+          <span class="badge badge-danger"><%= notificationCount %></span> <!-- Display the badge with the count -->
+          <% } %>
 				</a>
 			</li>
 			<li class="list ab">
-				<a href="#" onclick="activateLink(this)" class="nav-link">
+				<a href="" onclick="activateLink(this)" class="nav-link">
 					<i class='fas fa-wheelchair icon housee'></i>
 					<span class="link">Disability</span>
 				</a>
 				<ul class="dropdown">
-					<li><a href="#" onclick="activateLink(this)" class="male">Male</a></li>
-					<li><a href="#" onclick="activateLink(this)" class="female">Female</a></li>
+					<li><a href="/Allocate/disable" onclick="activateLink(this)" class="male">Male</a></li>
+					<li><a href="/Allocate/disablefemale" onclick="activateLink(this)" class="female">Female</a></li>
 				</ul>
 			</li>
 
@@ -147,12 +180,20 @@
 				<div class="content">
 					<div class="search">
 						<input type="text" class="search__input" arial-label="search"
-							placeholder="Search student by name">
+							placeholder="Search ..." oninput="handleSearch()">
 						<button class="search__submit" arial-label="submit search"><i class="fas fa-search"></i>
 						</button>
 					</div>
 				</div>
 			</form>
+      <div class="darkmo">
+				<input type="checkbox" id="toggle">
+				<label for="toggle" class="button"></label>
+			</div>
+			<div class="search-results-container">
+						 <div class="search-results">
+						 </div>
+					 </div>
 			<div class="profile">
 				<div class="pro">
 					<img src="/img/rannas.png" class="pro-pic" alt="">
@@ -161,11 +202,15 @@
 				<ul class="profile-link">
 					<li><a href="#"><i class='bx bxs-user-circle icon profile-drop'></i>
 							Profile</a></li>
+
 					<li><a href="#"><i class='bx bxs-cog profile-drop'></i> Settings</a></li>
 					<li><a href="#"><i class='bx bxs-log-out-circle profile-drop'></i> Logout</a></li>
+
 				</ul>
 			</div>
 		</nav>
+
+
 
 
 
@@ -421,9 +466,142 @@ function EditStdDetails() {
   popup.classList.toggle("active");
 }
 </script>
-
 <script>
+  // Get the current page or route
+  var currentPage = window.location.pathname;
+
+  // Remove the active class from all nav-links
+  var navLinks = document.querySelectorAll('.nav-link');
+  navLinks.forEach(function(link) {
+    link.classList.remove('block-back');
+  });
+
+  // Find the corresponding nav-link based on the current page and add the active class
+  var activeLink = document.querySelector('.nav-link[href="' + currentPage + '"]');
+  if (!activeLink) {
+    // If the current page is the root path, select the "Dashboard" link
+    activeLink = document.querySelector('.nav-link[href="/dashboard/dash"]');
+  }
+  if (activeLink) {
+    activeLink.classList.add('block-back');
+  }
+</script>
+<script type="text/javascript">
+ // Step 1: Add event listener to search input
+const searchInput = document.querySelector('.search__input');
+searchInput.addEventListener('input', handleSearch);
+searchInput.addEventListener('blur', hideSearchResults);
+
+// Step 2: Handle search event
+function handleSearch() {
+  // Step 2a: Retrieve search query
+  const searchQuery = searchInput.value.trim();
+
+  // Step 3: Implement search logic
+	let list = [];
+
+	Promise.all([
+	  fetch(`/api/blocks`).then(response => {
+	    if (!response.ok) {
+	      throw new Error('Failed to fetch data');
+	    }
+	    return response.json();
+	  }),
+	  fetch(`/room/api/rooms`).then(response => {
+	    if (!response.ok) {
+	      throw new Error('Failed to fetch data');
+	    }
+	    return response.json();
+	  })
+	])
+	  .then(([data, dataroom]) => {
+	    // console.log(data);
+	    // console.log(dataroom);
+	    for (let i = 0; i < data.length; i++) {
+
+	      list.push(data[i].block_name);
+	    }
+	    for (let i = 0; i < dataroom.length; i++) {
+
+	      list.push(dataroom[i].room_name);
+	    }
+
+			const filteredResults = list.filter((name) =>
+				name.toLowerCase().includes(searchQuery.toLowerCase())
+			);
+
+		console.log(filteredResults)
+			// Step 4: Update DOM with search results
+			displaySearchResults(filteredResults);
+	    // console.log("list", list);
+	  })
+	  .catch(error => {
+	    console.error(error);
+	  });
 
 
+  // const studentNames = ['John Doe', 'Jane Smith', 'Alice Johnson', 'Bob Thompson'/]; // Example data source
+
+}
+
+// Step 4: Display search results in the DOM
+// Step 4: Display search results in the DOM
+function displaySearchResults(results) {
+  const searchResultsContainer = document.querySelector('.search-results');
+  searchResultsContainer.innerHTML = ''; // Clear previous results
+
+  if (results.length === 0) {
+    searchResultsContainer.innerHTML = 'No results found.';
+    return;
+  }
+
+  // Create and append result elements to the container
+  results.forEach((result) => {
+    const resultItem = document.createElement('div');
+    const resultLink = document.createElement('a');
+    resultLink.href = '#' + result; // Set the URL of the anchor tag
+    resultLink.textContent = result;
+    resultItem.appendChild(resultLink);
+    searchResultsContainer.appendChild(resultItem);
+    resultItem.addEventListener('click', () => {
+      window.location.href = '/path/to/another/page'; // Replace with the actual path to the desired page
+    });
+  });
+
+  // Show the search results container
+  const searchResultsContainerWrapper = document.querySelector('.search-results-container');
+  searchResultsContainerWrapper.style.display = 'block';
+  searchResultsContainerWrapper.addEventListener('click', (event) => {
+    event.stopPropagation(); // Prevent the click event from propagating to the parent container
+  });
+}
+
+// Hide search results container when clicking outside
+document.addEventListener('click', (event) => {
+  const searchResultsContainerWrapper = document.querySelector('.search-results-container');
+  if (!searchResultsContainerWrapper.contains(event.target)) {
+    searchResultsContainerWrapper.style.display = 'none';
+  }
+});
+
+
+// Show search results container
+function showSearchResults() {
+  const searchResultsContainerWrapper = document.querySelector('.search-results-container');
+  searchResultsContainerWrapper.style.display = 'block';
+}
+function hideSearchResults() {
+	// Hide search results container when clicking outside
+document.addEventListener('click', (event) => {
+  const searchResultsContainerWrapper = document.querySelector('.search-results-container');
+  const parentDiv = document.querySelector('.parent-div'); // Replace '.parent-div' with the selector for your parent div
+
+  // Check if the clicked element is outside both the search results container and the parent div
+  if (!searchResultsContainerWrapper.contains(event.target) && !parentDiv.contains(event.target)) {
+    searchResultsContainerWrapper.style.display = 'none';
+  }
+});
+
+}
 
 </script>

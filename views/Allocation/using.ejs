@@ -1,3 +1,5 @@
+
+
 <-- <style>
   body {
       display: flex;
@@ -80,9 +82,7 @@
       <div class="form-group">
         <div class="form-group-label">select boys Hostel</div>
         <div class="form-checkboxes">
-        
         <% for(var i = 0; i < block.length; i++) { %>
-
           <% if(block[i].type === "boys") { %>
               <label class="form-checkbox">
                 <input type="checkbox" id="group1-option<%= i %>" name="group1-option1" value="<%= block[i]._id %>">
@@ -91,7 +91,6 @@
               </label>
               <p><%= block[i].no_of_rooms %></p>
           <% } %>
-   
 
         <% } %>
 
@@ -119,9 +118,9 @@
   </div>
 
   <script>
+
     function getTotalStudents() {
       const yearSelect = document.getElementById("year-select").value;
-
       fetch(`http://localhost:3000/students/students/${yearSelect}`)
         .then(response => {
           if (!response.ok) {
@@ -186,11 +185,9 @@
   })
   .then(response => {
     if (!response.ok) {
-      return response.json().then(data => {
-      throw new Error(data.message);
-    });
-  }
-  return response.json();
+      throw new Error('Failed to allocate rooms');
+    }
+    return response.json();
   })
   .then(data => {
     console.log(data.message);
@@ -198,10 +195,8 @@
   })
   .catch(error => {
     console.error(error);
-    alert(error)
   });
 }
 
 
-  </script>
-  -->
+  </script> -->

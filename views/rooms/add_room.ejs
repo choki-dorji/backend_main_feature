@@ -1,53 +1,275 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <h1>Create a New Room</h1>
+<%- include('../required/header.ejs') %>
 
-<form id="create-room-form">
-  <label for="room-name">Room Name:</label>
-  <input type="text" id="room-name" name="room_name" required>
-  
-  <label for="room-capacity">Room Capacity:</label>
-  <input type="number" id="room-capacity" name="room_capacity" required>
-  
-  <label for="block-id">Block ID:</label>
-  <input type="text" id="block-id" name="blockid" required>
-  
-  <label for="is-disabled">Is Disabled:</label>
-  <input type="checkbox" id="is-disabled" name="isDisabled">
-  
-  <label for="status">Status:</label>
-  <select id="status" name="status">
-    <option value="available">Available</option>
-    <option value="occupied">Occupied</option>
-    <option value="maintenance">Maintenance</option>
-  </select>
-  
-  <button type="submit">Create Room</button>
+
+
+<style type="text/css">
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700");
+
+$color: #80868b;
+$active-color: #1a73e8;
+$error-color: #f44336;
+$input-value-color: #202124;
+$border-color: 1px solid #dadce0;
+
+$border-color-active: 2px solid $active-color;
+$default-background: #fff;
+
+/* Buttons */
+$btn-default-bg-color: #fff;
+$btn-default-bgh-color: #ddd;
+$btn-default-text-color: #333;
+
+$btn-primary-bg-color: #1a73e8;
+$btn-primary-bgh-color: #287ae6;
+$btn-primary-boxshadow-color: 0 1px 1px 0 rgba(66, 133, 244, 0.45),
+  0 1px 3px 1px rgba(66, 133, 244, 0.3);
+$btn-primary-text-color: #fff;
+
+body {
+  font-family: "open sans", roboto, arial, sans-seif;
+  background: $default-background;
+}
+input {
+  background: $default-background;
+}
+#form {
+  width: 40vw;
+  margin: 0 auto;
+  margin-top: 12rem;
+  border: 1px solid black;
+  padding-left:  40px;
+  padding-right:  40px;
+  border-radius: 12px;
+  padding-top: 40px;
+  padding-bottom: 70px;
+}
+
+.input-box {
+  position: relative;
+  margin: 10px 0;
+  .input-label {
+    position: absolute;
+    color: $color;
+    font-size: 16px;
+    font-weight: 400;
+    max-width: calc(100% - (2 * 8px));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    left: 8px;
+    top: 13px;
+    padding: 0 8px;
+    transition: 250ms;
+    user-select: none;
+    pointer-events: none;
+    svg {
+      position: relative;
+      width: 15px;
+      height: 15px;
+      top: 2px;
+      transition: 250ms;
+    }
+  }
+  .input-1 {
+    box-sizing: border-box;
+    height: 50px;
+    width: 100%;
+    border-radius: 4px;
+    color: $input-value-color;
+    border: $border-color;
+    padding: 13px 15px;
+
+    transition: 250ms;
+    &:focus {
+      outline: none;
+      border: 2px solid #1a73e8;
+      transition: 250ms;
+    }
+  }
+}
+.input-box.error {
+  .input-label {
+    color: $error-color;
+    top: -8px;
+    background: $default-background;
+    font-size: 11px;
+    transition: 250ms;
+  }
+  .input-1 {
+    border: 2px solid $error-color;
+  }
+}
+.input-box.focus,
+.input-box.active {
+  .input-label {
+    color: $active-color;
+    top: -8px;
+    background: $default-background;
+    font-size: 11px;
+
+    transition: 250ms;
+
+    svg {
+      position: relative;
+      width: 11px;
+      height: 11px;
+      top: 2px;
+      transition: 250ms;
+    }
+  }
+}
+.input-box.active {
+  .input-1 {
+    border: 2px solid #1a73e8;
+  }
+}
+.btn {
+  background: $btn-default-bg-color;
+  color: $btn-default-text-color;
+  cursor: pointer;
+  border: none;
+  white-space: normal;
+  letter-spacing: 0.25px;
+  font-weight: 400;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  line-height: 20px;
+  min-width: 88px;
+  transition: 250ms;
+
+  &:hover {
+    background: $btn-default-bgh-color;
+    transition: 250ms;
+  }
+  &:focus {
+    outline: none;
+  }
+}
+.btn-primary {
+  background: $btn-primary-bg-color;
+  color: $btn-primary-text-color;
+  transition: 250ms;
+  &:hover {
+    background: $btn-primary-bgh-color;
+    transition: 250ms;
+  }
+}
+
+.pull-right {
+  float: right;
+}
+.clear {
+  clear: both;
+}
+@media screen and (max-width: 760px) {
+  #form {
+    width: 90%;
+   margin-left: 3.5rem;
+   justify-content: center;
+  align-items: center;
+  }
+  .btn{
+    width: 100%;
+    height:  10%;
+  }
+}
+
+@media screen and (min-width: 760px) {
+  #form {
+    width: 70%;
+   margin-left: 9rem;
+  }
+}
+.btn {
+  margin-top: 16px;
+}
+select{
+  background-color: white;
+}
+
+</style>
+
+
+  <form id="form">
+
+    <div class="input-box">
+    <h5 style="text-align: center;">Create Room</h5>
+  </div>
+  <div class="input-box">
+    <label class="input-label">Room Name</label>
+    <input type="text" class="input-1" name="room_name" id="room-name" required onfocus="setFocus(true)" onblur="setFocus(false)" />
+  </div>
+   <div class="input-box">
+    <label class="input-label">Room Capacity</label>
+    <input type="number" class="input-1" id="room-capacity" name="room_capacity" required onfocus="setFocus(true)" onblur="setFocus(false)" />
+  </div>
+
+  <div class="input-box">
+    <label class="input-label">Block</label>
+    <select class="input-1" id="block-id" name="blockid" required onfocus="setFocus(true)" onblur="setFocus(false)">
+      <option value="" disabled selected></option>
+      <% for(var j = 0; j < block.length; j++)  { %>
+      <option value="<%= block[j]._id %>"><%= block[j].block_name %></option>
+      <% } %>
+
+    </select>
+  </div>
+  <div class="input-box">
+    <label class="input-label">Status</label>
+    <select class="input-1" id="status" name="status" onfocus="setFocus(true)" onblur="setFocus(false)">
+        <option value="" disabled selected></option>
+      <option value="available">Available</option>
+      <option value="unavailable">Unavailable</option>
+
+    </select>
+  </div>
+
+  <div class="input-box">
+    <label class="input-label">isDisabled</label>
+    <select class="input-1" id="isDisabled" name="isDisabled" onfocus="setFocus(true)" onblur="setFocus(false)">
+      <option value="" disabled selected></option>
+      <option value="true">True</option>
+      <option value="false">False</option>
+
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary pull-right">CREATE</button>
 </form>
-
-<div id="message"></div>
-
+</body>
 <script>
-  const form = document.querySelector('#create-room-form');
-  const message = document.querySelector('#message');
+  function setFocus(on) {
+  var element = document.activeElement;
+  if (on) {
+    setTimeout(function () {
+      element.parentNode.classList.add("focus");
+    });
+  } else {
+    let box = document.querySelector(".input-box");
+    box.classList.remove("focus");
+    $("input").each(function () {
+      var $input = $(this);
+      var $parent = $input.closest(".input-box");
+      if ($input.val()) $parent.addClass("focus");
+      else $parent.removeClass("focus");
+    });
+  }
+}
+const form = document.querySelector('#form');
+
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    
+
     const roomName = document.querySelector('#room-name').value;
     const roomCapacity = document.querySelector('#room-capacity').value;
     const blockId = document.querySelector('#block-id').value;
-    const isDisabled = document.querySelector('#is-disabled').checked;
     const status = document.querySelector('#status').value;
-    
+    const isDisabled = document.querySelector('#isDisabled').value;
+
+    console.log(roomName, roomCapacity, blockId, status, isDisabled)
+
     try {
       const response = await fetch('api/rooms', {
         method: 'POST',
@@ -62,19 +284,58 @@
           status: status
         })
       });
-      
+
+      const responsedata = await response.json()
+
+      console.log("response ", responsedata)
+
       if (response.ok) {
-        message.textContent = 'Room created successfully!';
         form.reset();
+        Toastify({
+        text: 'Room created successfully!',
+        backgroundColor: '#00b09b',
+        className: "info",
+        gravity: "top",
+        position: "center",
+        offset: {
+          x: 0, // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+          y: 20 // vertical axis - can be a number or a string indicating unity. eg: '2em'
+        }
+      }).showToast();
+      
       } else {
-        const errorMessage = await response.text() || 'Failed to create room';
-        message.textContent = errorMessage;
+         const errorMessage = await response.text() || 'Failed to create room';
+      Toastify({
+        text: errorMessage,
+        backgroundColor: '#ff416c',
+        className: "error",
+        gravity: "top",
+        position: "center",
+        offset: {
+          x: 0, // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+          y: 20 // vertical axis - can be a number or a string indicating unity. eg: '2em'
+        }
+      }).showToast();
       }
     } catch (err) {
       console.error(err);
-      message.textContent = 'Failed to create room';
+       console.error(err);
+    Toastify({
+      text: 'Failed to create room',
+      backgroundColor: '#ff416c',
+      className: "error",
+      gravity: "top",
+      position: "center",
+      offset: {
+        x: 0, // horizontal axis - can be a number or a string indicating unity. eg: '2em'
+        y: 20 // vertical axis - can be a number or a string indicating unity. eg: '2em'
+      }
+    }).showToast();
     }
   });
+
 </script>
-</body>
+
+
+
 </html>

@@ -291,7 +291,7 @@ const STUDENTS = [
     photo: "78ujnhbgty67",
     disability: true,
     medical_report: "2a2sdf43df23",
-    year: "5",
+    year: "4",
   },
   {
     id: "1b9c25f3-8f08-4df3-9e45-4c2014f4db4d",
@@ -399,7 +399,7 @@ const STUDENTS = [
     account_no: 123456789,
     name_of_account_holder: "Elena Garcia",
     photo: "fghjklwerty",
-    disability: false,
+    disability: true,
     medical_report: null,
     year: "3",
   },
@@ -429,8 +429,36 @@ const STUDENTS = [
 
 exports.GetStudents = (years) => {
   let students = STUDENTS.filter(
-    (student) => student.year === String(years) && student.isDisabled !== true
+    (student) => student.year === String(years) && student.disability !== true
   );
   students = students.sort(() => Math.random() - 0.5);
   return students;
 };
+
+exports.countStudentsByYear = (years) => {
+  let maleCount = 0;
+  let femaleCount = 0;
+
+  const students = STUDENTS;
+
+  // Iterate over each student
+  students.forEach((student) => {
+    // Check if the student's year matches the specified year
+    if (student.year === years) {
+      // Increment the corresponding count based on the student's gender
+      if (student.gender === 'M') {
+        maleCount++;
+      } else if (student.gender === 'F') {
+        femaleCount++;
+      }
+    }
+  });
+
+  // Return an object with the male and female counts
+  return { male: maleCount, female: femaleCount };
+}
+
+
+exports.GetAllStudents = () => {
+  return STUDENTS
+}

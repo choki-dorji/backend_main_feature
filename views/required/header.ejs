@@ -57,12 +57,12 @@
    <link rel="stylesheet" href="/css/room_alloc.css">
   <link rel="stylesheet" href="/css/request.css">
   <link rel="stylesheet" href="/css/searchh.css">
-	<link rel="stylesheet" href="/css/disability.css">
-
+  <link rel="stylesheet" href="/css/disability.css">
+  <!-- <link rel="stylesheet" href="/css/searchresult.css"> -->
 	<title>Hostel Allocation</title>
 	<style>
 	.search-results-container {
-  display: none;
+    display: none;
   position: absolute;
   background-color: #ccc;
   border-radius: 9px;
@@ -186,10 +186,6 @@
 					</div>
 				</div>
 			</form>
-      <div class="darkmo">
-				<input type="checkbox" id="toggle">
-				<label for="toggle" class="button"></label>
-			</div>
 			<div class="search-results-container">
 						 <div class="search-results">
 						 </div>
@@ -493,58 +489,65 @@ searchInput.addEventListener('input', handleSearch);
 searchInput.addEventListener('blur', hideSearchResults);
 
 // Step 2: Handle search event
+// Step 2: Handle search event
 function handleSearch() {
   // Step 2a: Retrieve search query
   const searchQuery = searchInput.value.trim();
 
   // Step 3: Implement search logic
-	let list = [];
+  let results = [];
 
-	Promise.all([
-	  fetch(`/api/blocks`).then(response => {
-	    if (!response.ok) {
-	      throw new Error('Failed to fetch data');
-	    }
-	    return response.json();
-	  }),
-	  fetch(`/room/api/rooms`).then(response => {
-	    if (!response.ok) {
-	      throw new Error('Failed to fetch data');
-	    }
-	    return response.json();
-	  })
-	])
-	  .then(([data, dataroom]) => {
-	    // console.log(data);
-	    // console.log(dataroom);
-	    for (let i = 0; i < data.length; i++) {
+  Promise.all([
+    fetch(`/api/blocks`).then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      return response.json();
+    }),
+    fetch(`/room/api/rooms`).then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      return response.json();
+    }),
+     fetch(`/students/allstudents`).then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      return response.json();
+    })
+  ])
+    .then(([blocksData, roomsData, studentdata]) => {
+      const blocks = blocksData.map(block => ({
+        id: block._id,
+        name: block.block_name,
+        type: 'block'
+      }));
+      const rooms = roomsData.map(room => ({
+        id: room._id,
+        name: room.room_name,
+        type: 'room'
+      }));
+      const students = studentdata.map(student => ({
+        id: student.sid,
+        name: student.name,
+        type: 'student'
+      }));
 
-	      list.push(data[i].block_name);
-	    }
-	    for (let i = 0; i < dataroom.length; i++) {
+      results = [...blocks, ...rooms, ...students].filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
 
-	      list.push(dataroom[i].room_name);
-	    }
-
-			const filteredResults = list.filter((name) =>
-				name.toLowerCase().includes(searchQuery.toLowerCase())
-			);
-
-		console.log(filteredResults)
-			// Step 4: Update DOM with search results
-			displaySearchResults(filteredResults);
-	    // console.log("list", list);
-	  })
-	  .catch(error => {
-	    console.error(error);
-	  });
-
-
-  // const studentNames = ['John Doe', 'Jane Smith', 'Alice Johnson', 'Bob Thompson'/]; // Example data source
-
+      // Step 4: Update DOM with search results
+      displaySearchResults(results);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
-// Step 4: Display search results in the DOM
+console.log(results)
+
 // Step 4: Display search results in the DOM
 function displaySearchResults(results) {
   const searchResultsContainer = document.querySelector('.search-results');
@@ -559,49 +562,77 @@ function displaySearchResults(results) {
   results.forEach((result) => {
     const resultItem = document.createElement('div');
     const resultLink = document.createElement('a');
-    resultLink.href = '#' + result; // Set the URL of the anchor tag
-    resultLink.textContent = result;
+    resultLink.href = '#'; // Set an empty URL for the anchor tag
+    resultLink.textContent = result.name;
     resultItem.appendChild(resultLink);
     searchResultsContainer.appendChild(resultItem);
+
     resultItem.addEventListener('click', () => {
-      window.location.href = '/path/to/another/page'; // Replace with the actual path to the desired page
+      // Handle click event to display details
+      displayDetails(result);
     });
   });
 
   // Show the search results container
   const searchResultsContainerWrapper = document.querySelector('.search-results-container');
   searchResultsContainerWrapper.style.display = 'block';
-  searchResultsContainerWrapper.addEventListener('click', (event) => {
-    event.stopPropagation(); // Prevent the click event from propagating to the parent container
-  });
 }
 
-// Hide search results container when clicking outside
-document.addEventListener('click', (event) => {
-  const searchResultsContainerWrapper = document.querySelector('.search-results-container');
-  if (!searchResultsContainerWrapper.contains(event.target)) {
-    searchResultsContainerWrapper.style.display = 'none';
+// Function to display details based on item type and ID
+function displayDetails(item) {
+  if (item.type === 'block') {
+    fetch(`/api/blocks/${item.id}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch block details');
+        }
+        return response.json();
+      })
+      .then(blockDetails => {
+        // Handle block details
+        window.location.href = `/block-details?id=${blockDetails._id}`;
+        console.log('Block Details:', blockDetails);
+        // Display block details in the UI
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  } else if (item.type === 'room') {
+    fetch(`/room/api/search?room_name=${item.name}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch room details');
+        }
+        return response.json();
+      })
+      .then(roomDetails => {
+        // Handle room details
+        window.location.href = `/room/room-details?id=${roomDetails.room._id}`;
+        console.log('Room Details:', roomDetails);
+        // Display room details in the UI
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }else if (item.type === 'student') {
+    fetch(`/students/search?studentSID=${item.id}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch student details');
+        }
+        return response.json();
+      })
+      .then(roomDetails => {
+        // Handle room details
+        window.location.href = `/students/students/display?id=${roomDetails.sid}`;
+        console.log('Room Details:', roomDetails);
+        // Display room details in the UI
+      })
+      .catch(error => {
+        console.error(error);
+      });
   }
-});
-
-
-// Show search results container
-function showSearchResults() {
-  const searchResultsContainerWrapper = document.querySelector('.search-results-container');
-  searchResultsContainerWrapper.style.display = 'block';
 }
-function hideSearchResults() {
-	// Hide search results container when clicking outside
-document.addEventListener('click', (event) => {
-  const searchResultsContainerWrapper = document.querySelector('.search-results-container');
-  const parentDiv = document.querySelector('.parent-div'); // Replace '.parent-div' with the selector for your parent div
 
-  // Check if the clicked element is outside both the search results container and the parent div
-  if (!searchResultsContainerWrapper.contains(event.target) && !parentDiv.contains(event.target)) {
-    searchResultsContainerWrapper.style.display = 'none';
-  }
-});
-
-}
 
 </script>

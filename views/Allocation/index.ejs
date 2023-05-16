@@ -285,6 +285,16 @@ margin-left:4.9rem;
     margin-top: 15px;
 }
 
+.descrip{
+display:flex;
+  flex-direction:row;
+  gap:1rem;
+margin:0 auto;
+border-radius:5px;
+}
+.deshea{
+color:#ff4b13;
+}
  </style>
 
 <main>
@@ -308,11 +318,12 @@ margin-left:4.9rem;
       <div class="col-lg-12 col-md-12 col-sm-12 block1">
 
         <div class="shadow-box1">
-
-          <p id="descriptionElement" style="margin-left: 200px">
-            Description
-          </p>
           <br><br>
+          <div class="descrip justify-content-center" >
+            <h4 class="deshea font-weight-bold text-uppercase" id="descriptionElement">
+            </h4>
+          </div>
+         <br>
           <h6 class="pre">Previous allocation</h6>
 
           <a class="" href="" style="cursor:pointer;">
@@ -605,6 +616,29 @@ if (event.target == modal) {
 
         // Cleanup
         document.body.removeChild(link);
+      });
+    </script>
+    <script>
+      // Retrieve the necessary elements
+     
+      const descriptionElement = document.getElementById("descriptionElement");
+    
+      // Add an event listener to the select element
+      yearSelect.addEventListener("change", () => {
+        // Get the selected year
+        const selectedYear = yearSelect.value;
+    
+        // Perform an asynchronous operation (e.g., fetch) to get the description
+        fetch(`/year/api/years/${selectedYear}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            // Update the description element with the retrieved description
+            descriptionElement.textContent = data.Description;
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
       });
     </script>
 

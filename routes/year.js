@@ -14,5 +14,6 @@ route.get("/allocations", yearController.report);
 
 // API
 route.post("/api/years", yearController.createdYear);
+route.get("/api/years/:year", yearController.getAcadYearByYear);
 
 exports.route = route;

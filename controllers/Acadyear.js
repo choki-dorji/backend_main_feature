@@ -88,3 +88,29 @@ exports.report = async (req, res, next) => {
   res.send(Acad);
   // return res.render("Allocation/index", { Acad: Acad });
 };
+
+// Add a new function to get academic year by year
+exports.getAcadYearByYear = async (req, res, next) => {
+  const year = req.params.year;
+
+  let acadYear;
+  try {
+    acadYear = await AcadYear.findOne({ Year: year });
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not find the academic year.",
+      500
+    );
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  if (!acadYear) {
+    const error = new HttpError(
+      "Could not find an academic year with the provided year.",
+      404
+    );
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  return res.status(200).json(acadYear);
+};

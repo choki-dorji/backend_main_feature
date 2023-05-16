@@ -1,4 +1,6 @@
 const axios = require("axios");
+const request = require("../models/models");
+const Request = request.Request;
 
 exports.StudentDashboard = (req, res) => {
   // calling student to get their detail
@@ -31,4 +33,10 @@ exports.StudentDashboard = (req, res) => {
     });
 
   // calling to get Roommate
+};
+
+
+exports.search_student = async (req, res) => {
+  const notificationCount = await Request.countDocuments({ clicked: false });
+  res.render("students/student-details", { notificationCount: notificationCount });
 };

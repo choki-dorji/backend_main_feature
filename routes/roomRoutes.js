@@ -30,4 +30,6 @@ route.get("/api/room/block/:id", roomController.getRoomByBlockId);
 
 route.delete("/api/room/student/:id", stud.editstudents);
 
+route.get("/room-details", service.search_room01);
+
 exports.route = route;

@@ -462,3 +462,16 @@ exports.countStudentsByYear = (years) => {
 exports.GetAllStudents = () => {
   return STUDENTS
 }
+
+
+exports.TotalAllStudents = (req, res) => {
+  res.json(STUDENTS)
+}
+
+exports.studentsbyName = (req, res) => {
+  const stdname = req.params.id;
+  let students = STUDENTS.filter(
+    (student) => student.name === stdname
+  );
+  res.json(students)
+}

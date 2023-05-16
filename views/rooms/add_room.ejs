@@ -35,15 +35,18 @@ input {
 #form {
   width: 40vw;
   margin: 0 auto;
-  margin-top: 12rem;
-  border: 1px solid black;
+  margin-top: 9rem;
+  border: 1px solid #4f4f4f;
   padding-left:  40px;
   padding-right:  40px;
   border-radius: 12px;
   padding-top: 40px;
   padding-bottom: 70px;
 }
-
+.pull-right:active, .pull-right:focus{
+  outline:none;
+  border:none;
+}
 .input-box {
   position: relative;
   margin: 10px 0;
@@ -138,26 +141,27 @@ input {
   min-width: 88px;
   transition: 250ms;
 
-  &:hover {
-    background: $btn-default-bgh-color;
-    transition: 250ms;
-  }
+ 
   &:focus {
     outline: none;
-  }
-}
-.btn-primary {
-  background: $btn-primary-bg-color;
-  color: $btn-primary-text-color;
-  transition: 250ms;
-  &:hover {
-    background: $btn-primary-bgh-color;
-    transition: 250ms;
   }
 }
 
 .pull-right {
   float: right;
+  opacity: 100;
+  color: #fff;
+  background-color: #ff4b13;
+  border-radius:5px;
+  border:none;
+  font-size:16px;
+height:45px;
+width:120px;
+
+}
+.pull-right:hover{
+  background-color:#ff4b13 ;
+  color:#fff;
 }
 .clear {
   clear: both;
@@ -194,7 +198,7 @@ select{
   <form id="form">
 
     <div class="input-box">
-    <h5 style="text-align: center;">Create Room</h5>
+    <h5 style="text-align: center; font-weight:bold;  padding-bottom:1rem;">Create Room</h5>
   </div>
   <div class="input-box">
     <label class="input-label">Room Name</label>
@@ -235,7 +239,8 @@ select{
     </select>
   </div>
 
-  <button type="submit" class="btn btn-primary pull-right">CREATE</button>
+  <button type="submit" class="btn pull-right">Create</button>
+  <br>
 </form>
 </body>
 <script>

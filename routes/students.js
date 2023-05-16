@@ -3,6 +3,7 @@ const route = express.Router();
 
 const student = require("../controllers/student");
 const service = require("../service/studentRender");
+const students = require("../controllers/apiconnection_lakshay/getStudents");
 
 // for thr ejs
 // route.get("/", service.getBlocks);
@@ -17,6 +18,12 @@ route.get("/search", student.searchStudentsBySID);
 route.get("/count/:years", student.countStudentsByYear);
 
 route.post("/delete/:students", student.createRemovedStudent);
+
+route.get("/allstudents", students.TotalAllStudents);
+
+route.get("/student/:id", students.studentsbyName)
+
+route.get("/students/display", service.search_student)
 
 // API
 

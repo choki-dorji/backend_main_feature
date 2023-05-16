@@ -3,7 +3,7 @@ const HttpError = require("../models/httperror");
 const database = require("../models/models");
 const Room = database.Room;
 const Block = database.Block;
-const Allocate = database.Allocation
+const Allocate = database.Allocation;
 
 // create
 exports.createRoom = async (req, res) => {
@@ -65,7 +65,7 @@ exports.createRoom = async (req, res) => {
     block.no_of_rooms += 1;
     await block.save({ session: sess });
     await sess.commitTransaction();
-    res.status(201).json({message: "room created successfully"})
+    res.status(201).json({ message: "room created successfully" });
   } catch (err) {
     console.log(err);
     const error = new HttpError("Creating room failed, please try again", 500);
@@ -173,6 +173,8 @@ exports.searchRoom = async (req, res) => {
 
   res.json({ room: room.toObject({ getters: true }) });
 };
+////////////////////////////////////////////////////////////////
+
 
 
 
@@ -200,7 +202,6 @@ exports.getRoomByBlockId = async (req, res, next) => {
   res.send(rooms);
 };
 
-
 // exports.getMembersIRoom = async (req, res) => {
 //   const roomid = req.params.id;
 //   const year= new Date().getFullYear();
@@ -220,8 +221,6 @@ exports.getRoomByBlockId = async (req, res, next) => {
 //     return res.status(error.code || 500).json({ message: error.message });
 //   }
 
-
-
 //   return res.json(members)
 
 // }
@@ -235,15 +234,19 @@ exports.getMembersIRoom = async (req, res) => {
     // Find allocations for the current year
     const allocations = await Allocate.find({ academicyear: currentYear });
 
-    console.log(allocations)
+    console.log(allocations);
 
     // Find the members in the specified room
     const roomId = req.params.id; // Assuming you pass the roomId as a parameter
-    const membersInRoom = allocations.filter(allocation => String(allocation.roomid) === roomId);
+    const membersInRoom = allocations.filter(
+      (allocation) => String(allocation.roomid) === roomId
+    );
 
     res.status(200).json({ membersInRoom });
   } catch (error) {
-    console.error('Error retrieving members in room:', error);
-    res.status(500).json({ error: 'An error occurred while retrieving members in room' });
+    console.error("Error retrieving members in room:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while retrieving members in room" });
   }
 };

@@ -19,7 +19,7 @@
 							<p class="gra-tota"><%= students.length %></p>
 						
 
-							<canvas id="myChart" style="height: 120px; width: 300px; min-height: 100px;"></canvas>
+							<canvas id="myChart" style="height: 120px; width: 300px; min-height: 100px; max-height: 300px;"></canvas>
 						</div>
 					</div>
 
@@ -100,16 +100,16 @@ const chart = new Chart(ctx, {
 	datasets: [
 	  {
 		label: 'Male',
-		backgroundColor: 'rgba(255, 75, 19, 0.3)',
-		borderColor: '#ff4b13',
-		borderWidth: 1,
+		backgroundColor: 'rgba(255, 75, 19, 0.9)',
+		// borderColor: '#000',
+		// borderWidth: 1,
 		data: chartData.map((d) => d.male),
 	  },
 	  {
 		label: 'Female',
-		backgroundColor: 'rgba(0, 0, 0, 0.3)',
-		borderColor: '#000000',
-		borderWidth: 1,
+		backgroundColor: 'rgba(79, 79, 79, .9)',
+		// borderColor: '#000000',
+		// borderWidth: 1,
 		data: chartData.map((d) => d.female),
 	  },
 	],

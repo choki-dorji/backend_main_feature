@@ -518,3 +518,48 @@ exports.disableF = async (req, res) => {
       res.send(err);
     });
 };
+
+exports.search_roomNav = async (req, res) => {
+  console.log("inside getBlocks");
+  const notificationCount = await Request.countDocuments({ clicked: false });
+  const token = req.query.token;
+  const err = req.query.error;
+  const username = req.query.username;
+  console.log("before axios");
+  const urlParams = new URLSearchParams(req._parsedUrl.search);
+  const id = urlParams.get("id");
+  console.log("id", id);
+
+  try {
+    axios
+      .all([
+        axios.get("http://localhost:5000/api/blocks"),
+        axios.get("http://localhost:5000/room/api/rooms"),
+        axios.get("http://localhost:5000/recent/recent"),
+      ])
+      .then(
+        axios.spread(function (blocksResponse, roomsResponse, studentResponse) {
+          console.log(req.path);
+          res.render("blockd/block-details", {
+            blocks: blocksResponse.data,
+            rooms: roomsResponse.data,
+            notificationCount: notificationCount,
+            token: token,
+            // username: username,
+            id: id,
+          });
+        })
+      )
+      .catch((err) => {
+        console.log(err);
+        res.send(err);
+      });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+exports.search_room01 = async (req, res) => {
+  const notificationCount = await Request.countDocuments({ clicked: false });
+  res.render("rooms/room-details", { notificationCount: notificationCount });
+};

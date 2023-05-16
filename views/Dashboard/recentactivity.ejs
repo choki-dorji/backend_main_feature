@@ -50,8 +50,9 @@
                 </tr>
               </thead>
               <tbody>
-                <% if(recentactivity) {%>
-                  <% for(var i = 0; i < 5; i++) { %>
+                <% if(recentactivity.length > 0) {%>
+
+                  <% for(var i = 0; i < recentactivity.length; i++) { %>
                 <tr>
                   <th scope="row"><%=i + 1 %></th>
                   <td><%= recentactivity[i].student %></td>

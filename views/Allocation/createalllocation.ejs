@@ -60,21 +60,23 @@
                                          <h6 style="text-align: center; width: 100%; margin-bottom: 3rem;"><strong>Select Male Block to allocate</strong></h6>
 
                                          <% for(var i = 0; i < block.length; i++) { %>
-                                           <% if(block[i].type === "boys") { %>
+                                          <% var sum = 0
+                                          for(var k = 0; k < room.length; k++) { %>
+                                            <%
+
+                                            if(room[k].blockid === block[i]._id)
+                                              sum += room[k].room_capacity
+                                            { %>
+                                              <% } %>
+                                                <% } %>
+                                           <% if(block[i].type === "boys" && sum > 0) { %>
                                         <div class="form-check-inline ml-4 fll">
                                             <input class="form-check-input checkmale"  type="checkbox" id="checkbox<%= i %>"  value="<%= block[i]._id %>" >
                                             <label class="form-check-label" for="checkbox<%= i %>">
                                                 <span></span>
                                                 <%= block[i].block_name %>
-                                                <% var sum = 0
-                                                for(var k = 0; k < room.length; k++) { %>
-                                                  <%
-
-                                                  if(room[k].blockid === block[i]._id)
-                                                    sum += room[k].room_capacity
-                                                  { %>
-                                                    <% } %>
-                                                      <% } %>
+                                                
+                                              
                                                 <span class="slott">
                                                     <p>
                                                       <%= sum %> slots
@@ -103,7 +105,16 @@
                                     <div class="boxx boxx1">
                                         <h6 style="text-align: center; width: 100%; margin-bottom: 3rem;"><strong>Select Female Block to allocate</strong></h6>
                                         <% for(var j = 0; j < block.length; j++) { %>
-                                          <% if(block[j].type === "girls") { %>
+                                          <% var sum = 0
+                                          for(var k = 0; k < room.length; k++) { %>
+                                            <%
+
+                                            if(room[k].blockid === block[j]._id)
+                                              sum += room[k].room_capacity
+                                            { %>
+                                              <% } %>
+                                                <% } %>
+                                          <% if(block[j].type === "girls" && sum > 0) { %>
                                           <div class=" form-check-inline ml-4 fll">
                                               <input class="form-check-input checkfemale" type="checkbox" id="checkboxf<%= j %>" value="<%= block[j]._id %>">
                                               <label class="form-check-label" for="checkboxf<%= j %>"  >
